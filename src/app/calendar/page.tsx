@@ -4,9 +4,9 @@ import Breadcrumb from "@/components/Breadcrumbs/Breadcrumb";
 import CalendarBox from "@/components/CalenderBox";
 
 export const metadata: Metadata = {
-  title: "Next.js Calender Page | NextAdmin - Next.js Dashboard Kit",
+  title: "Blochange Calender Page",
   description:
-    "This is Next.js Calender page for NextAdmin  Tailwind CSS Admin Dashboard Kit",
+    "This is Blochange Calender page for   Tailwind CSS Admin Dashboard Kit",
   // other metadata
 };
 

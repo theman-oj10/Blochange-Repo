@@ -4,7 +4,7 @@ import { useParams } from 'next/navigation';
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Image from 'next/image';
 import Link from 'next/link';
-import profilePic from '../../public/images/team/team-01.png';
+import profilePic from '../../public/images/team-01.png';
 import Milestones from '@/components/Milestones';
 import TopDonors from '@/components/TopDonors';
 import ChartOne from "@/components/Charts/ChartOne";

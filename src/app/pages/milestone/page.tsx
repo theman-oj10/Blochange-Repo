@@ -5,8 +5,8 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import CreateMilestone from '@/components/Project/CreateMilestone'
 
 export const metadata: Metadata = {
-  title: "Next.js Settings Page | NextAdmin - Next.js Dashboard c",
-  description: "This is Next.js Settings page for NextAdmin Dashboard Kit",
+  title: "Blochange Settings Page",
+  description: "This is Blochange Settings page",
 };
 
 const Settings = () => {

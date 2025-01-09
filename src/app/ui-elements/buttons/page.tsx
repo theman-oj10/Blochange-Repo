@@ -4,8 +4,8 @@ import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import ButtonDefault from "@/components/Buttons/ButtonDefault";
 
 export const metadata: Metadata = {
-  title: "Next.js Buttons Page | NextAdmin - Next.js Dashboard Kit",
-  description: "This is Next.js Buttons page for NextAdmin Dashboard Kit",
+  title: "Blochange Buttons Page",
+  description: "This is Blochange Buttons page",
 };
 
 const Buttons = () => {

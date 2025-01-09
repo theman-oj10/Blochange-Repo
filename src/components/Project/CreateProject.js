@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useEffect } from "react";
 import { Web3Context } from "@/contexts/Web3Context";
 import { ethers } from "ethers";
 
@@ -9,13 +9,71 @@ const CreateProject = () => {
   const [beneficiary, setBeneficiary] = useState("");
   const [projectName, setProjectName] = useState("");
   const [description, setDescription] = useState("");
-  const [goalAmount, setGoalAmount] = useState("");
+  const [goalAmountUSD, setGoalAmountUSD] = useState("");
+  const [goalAmountCrypto, setGoalAmountCrypto] = useState("");
   const [txStatus, setTxStatus] = useState("");
+  const [conversionRate, setConversionRate] = useState(null);
+  const [selectedCrypto, setSelectedCrypto] = useState("ethereum");
+
+  useEffect(() => {
+    const fetchConversionRate = async () => {
+      try {
+        const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${selectedCrypto}&vs_currencies=usd`);
+        const data = await response.json();
+        setConversionRate(data[selectedCrypto].usd);
+      } catch (error) {
+        console.error("Error fetching conversion rate:", error);
+      }
+    };
+
+    fetchConversionRate();
+    const interval = setInterval(fetchConversionRate, 60000);
+
+    return () => clearInterval(interval);
+  }, [selectedCrypto]);
+
+  const handleUSDChange = (value) => {
+    // Allow only numbers and decimal point
+    const numericValue = value.replace(/[^0-9.]/g, '');
+    
+    // Ensure only one decimal point
+    const parts = numericValue.split('.');
+    if (parts.length > 2) {
+      parts.pop();
+    }
+    const sanitizedValue = parts.join('.');
+
+    setGoalAmountUSD(sanitizedValue);
+    if (conversionRate && sanitizedValue !== "") {
+      setGoalAmountCrypto((parseFloat(sanitizedValue) / conversionRate).toFixed(6));
+    } else {
+      setGoalAmountCrypto("");
+    }
+  };
+
+  const handleCryptoChange = (value) => {
+    // Allow only numbers and decimal point
+    const numericValue = value.replace(/[^0-9.]/g, '');
+    
+    // Ensure only one decimal point
+    const parts = numericValue.split('.');
+    if (parts.length > 2) {
+      parts.pop();
+    }
+    const sanitizedValue = parts.join('.');
+
+    setGoalAmountCrypto(sanitizedValue);
+    if (conversionRate && sanitizedValue !== "") {
+      setGoalAmountUSD((parseFloat(sanitizedValue) * conversionRate).toFixed(2));
+    } else {
+      setGoalAmountUSD("");
+    }
+  };
 
   const handleCreateProject = async (e) => {
     e.preventDefault();
 
-    if (!beneficiary || !projectName || !description || !goalAmount) {
+    if (!beneficiary || !projectName || !description || !goalAmountCrypto) {
       alert("Please fill in all fields.");
       return;
     }
@@ -27,12 +85,9 @@ const CreateProject = () => {
 
     try {
       setTxStatus("Initiating transaction...");
-      // This requires modification to the smart contract, right now beneificiary is the one parameter accepted
       const tx = await contract.createProject(
         beneficiary,
-        // projectName,
-        // description,
-        ethers.parseEther(goalAmount)
+        ethers.parseEther(goalAmountCrypto)
       );
       setTxStatus("Transaction sent. Waiting for confirmation...");
       const receipt = await tx.wait();
@@ -56,7 +111,8 @@ const CreateProject = () => {
           beneficiary,
           projectName,
           description,
-          goalAmount: ethers.parseEther(goalAmount).toString(),
+          goalAmount: ethers.parseEther(goalAmountCrypto).toString(),
+          goalAmountUSD,
         }),
       });
 
@@ -71,6 +127,7 @@ const CreateProject = () => {
       setTxStatus("Transaction failed.");
     }
   };
+
 
   return (
     <div className="grid grid-cols-1 gap-8">
@@ -143,23 +200,49 @@ const CreateProject = () => {
             </div>
 
             <div className="mb-5">
-              <label
-                htmlFor="goalAmount"
-                className="mb-2 block text-sm font-medium text-dark dark:text-white"
-              >
-                Goal Amount (ETH/MATIC)
+              <label className="mb-2 block text-sm font-medium text-dark dark:text-white">
+                Goal Amount
               </label>
-              <div className="relative">
-                <input
-                  type="number"
-                  id="goalAmount"
-                  name="goalAmount"
-                  placeholder="10"
-                  value={goalAmount}
-                  onChange={(e) => setGoalAmount(e.target.value)}
-                  className="w-full rounded-md border border-stroke bg-white py-2.5 pl-3 pr-4 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
-                />
+              <div className="grid grid-cols-2 gap-4">
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="goalAmountUSD"
+                    name="goalAmountUSD"
+                    placeholder="USD"
+                    value={goalAmountUSD}
+                    onChange={(e) => handleUSDChange(e.target.value)}
+                    className="w-full rounded-md border border-stroke bg-white py-2.5 pl-3 pr-4 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+                  />
+                  <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
+                    USD
+                  </span>
+                </div>
+                <div className="relative">
+                  <input
+                    type="text"
+                    id="goalAmountCrypto"
+                    name="goalAmountCrypto"
+                    placeholder={selectedCrypto === "ethereum" ? "ETH" : "MATIC"}
+                    value={goalAmountCrypto}
+                    onChange={(e) => handleCryptoChange(e.target.value)}
+                    className="w-full rounded-md border border-stroke bg-white py-2.5 pl-3 pr-4 text-dark focus:border-primary focus:outline-none dark:border-dark-3 dark:bg-dark-2 dark:text-white dark:focus:border-primary"
+                  />
+                  <select
+                    value={selectedCrypto}
+                    onChange={(e) => setSelectedCrypto(e.target.value)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 bg-transparent text-gray-500"
+                  >
+                    <option value="ethereum">ETH</option>
+                    <option value="matic-network">MATIC</option>
+                  </select>
+                </div>
               </div>
+              {conversionRate && (
+                <p className="mt-2 text-sm text-gray-500">
+                  1 USD = {(1 / conversionRate).toFixed(6)} {selectedCrypto === "ethereum" ? "ETH" : "MATIC"}
+                </p>
+              )}
             </div>
 
             <div className="flex justify-end gap-4">
