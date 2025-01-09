@@ -26,10 +26,7 @@ const TopDonors: React.FC = () => {
     { name: 'Sarah Williams', amount: '$3,500', logo: getRandomImage() },
     { name: 'Robert Smith', amount: '$3,245', logo: getRandomImage() },
     { name: 'Lisa Chen', amount: '$2,980', logo: getRandomImage() },
-    { name: 'David Brown', amount: '$2,750', logo: getRandomImage() },
-    { name: 'Amanda Garcia', amount: '$2,500', logo: getRandomImage() },
-    { name: 'James Wilson', amount: '$2,300', logo: getRandomImage() },
-    { name: 'Emily Taylor', amount: '$2,100', logo: getRandomImage() },
+    
   ];
 
   return (

@@ -11,7 +11,7 @@ export async function POST(request) {
     }
 
     const client = await connectToDatabase();
-    let milestones = [1,2,3];
+    let milestones = [10000,20000,30000];
     console.log("Client: ", client)
     const db = client.db('charityDB');
     const projects = db.collection('projects');

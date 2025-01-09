@@ -26,7 +26,7 @@ const CharityCard: React.FC<CharityCardProps> = ({
   goalAmount = goalAmount / 1000000000000000; // FIX!
   return (
     <Link href={`/charity/${id}`} className="block h-full">
-      <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 h-full flex flex-col">
+      <div className="rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 h-full flex flex-col">
         <Image src={imageUrl} alt={name} width={400} height={200} className="w-full h-48 object-cover" />
         <div className="p-4 flex flex-col flex-grow">
           <h3 className="text-xl font-semibold mb-2">{name}</h3>
@@ -38,8 +38,8 @@ const CharityCard: React.FC<CharityCardProps> = ({
             </div>
             <progress value={raisedAmount} max={goalAmount} className="w-full mb-2"></progress>
             <div className="flex justify-between text-sm text-gray-500">
-              <span>{donorCount} donors</span>
-              <span>{daysLeft} days left</span>
+              <span>{donorCount} 25 donors</span>
+              <span>{daysLeft} 12 days left</span>
             </div>
           </div>
         </div>
