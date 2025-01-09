@@ -1,6 +1,10 @@
 import Discover from "@/app/discover/page";
 import { Metadata } from "next";
+import DefaultLayout from "@/components/Layouts/DefaultLaout";
+import { Web3Provider } from "../contexts/Web3Context"
 import React from "react";
+import WalletConnectButton from '@/components/Wallet/WalletConnect';
+
 
 export const metadata: Metadata = {
   title:
@@ -11,7 +15,9 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <>
-        <Discover />
+      <Web3Provider>
+      <Discover />
+      </Web3Provider>
     </>
   );
 }
