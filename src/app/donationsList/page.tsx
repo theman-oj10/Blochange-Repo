@@ -1,89 +1,56 @@
-"use client";
-import React, { useState, useEffect } from "react";
+"use client"
+import React, { useState, useEffect, useContext } from "react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import DonationCard from "@/components/DonationCard";
-import FilterMenu from "@/components/FilterMenu";
-import { getRandomImage } from "../unsplashApi";
+import { Web3Context } from "@/contexts/Web3Context"; // Assuming you have a Web3 context
 
-const charityCategories = [
-  "All", "Animals", "Arts", "Community", "Education", "Environment", "Healthcare", "Overseas", "Social", "Sports"
-];
-
-const mockCharities = [
-  {
-    id: 1,
-    name: "Support Children & Youths",
-    description: "Help disadvantaged children and youth achieve their potential.",
-    raisedAmount: 450,
-    goalAmount: 9988,
-    daysLeft: 2,
-    donorCount: 8,
-    category: "Education"
-  },
-  {
-    id: 2,
-    name: "Boost seniors' safety and independence",
-    description: "Eliminate fall hazards in homes of elderly citizens.",
-    raisedAmount: 310,
-    goalAmount: 20000,
-    daysLeft: 2,
-    donorCount: 10,
-    category: "Healthcare"
-  },
-  // Add more mock charities here
-];
-
-const Discover: React.FC = () => {
-  const [selectedCategory, setSelectedCategory] = useState("All");
-  const [charities, setCharities] = useState(mockCharities);
+const DonationHistory: React.FC = () => {
+  const [donationHistory, setDonationHistory] = useState([]);
+  const { account, connectWallet, disconnectWallet } = useContext(Web3Context);
 
   useEffect(() => {
-    const fetchImages = async () => {
-      const updatedCharities = await Promise.all(
-        mockCharities.map(async (charity) => {
-          const imageUrl = await getRandomImage(`${charity.category} charity`);
-          return { ...charity, imageUrl };
-        })
-      );
-      setCharities(updatedCharities);
+    const fetchDonationHistory = async () => {
+
+      try {
+        const response = await fetch(`/api/getDonationHistory?address=${account}`);
+        const data = await response.json();
+        setDonationHistory(data.donations);
+      } catch (error) {
+        console.error("Error fetching donation history:", error);
+      }
     };
 
-    fetchImages();
-  }, []);
-
-  const filteredCharities = selectedCategory === "All"
-    ? charities
-    : charities.filter(charity => charity.category === selectedCategory);
+    fetchDonationHistory();
+  }, [account]);
 
   return (
     <DefaultLayout>
       <div className="container mx-auto px-4 py-8">
-        <h1 className="text-3xl font-bold mb-8">Discover Charities</h1>
+        <h1 className="text-3xl font-bold mb-8">Your Donation History</h1>
         
-        <FilterMenu
-          categories={charityCategories}
-          selectedCategory={selectedCategory}
-          onCategoryChange={setSelectedCategory}
-        />
-        
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
-          {filteredCharities.map((charity) => (
-            <DonationCard
-              key={charity.id}
-              id={charity.id}
-              name={charity.name}
-              description={charity.description}
-              imageUrl={charity.imageUrl || '/images/default-charity-image.jpg'}
-              raisedAmount={charity.raisedAmount}
-              goalAmount={charity.goalAmount}
-              daysLeft={charity.daysLeft}
-              donorCount={charity.donorCount}
-            />
-          ))}
-        </div>
+        {donationHistory.length === 0 ? (
+          <p>You have not made any donations yet.</p>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
+            {donationHistory.map((donation) => (
+              <DonationCard
+                key={donation.projectId}
+                id={donation.projectId}
+                name={donation.name}
+                description={donation.description}
+                imageUrl={donation.imageUrl || '/images/default-charity-image.jpg'} // Add imageUrl if needed
+                raisedAmount={donation.raisedAmount}
+                goalAmount={donation.goalAmount}
+                daysLeft={donation.daysLeft}
+                donorCount={donation.donorCount}
+                amountDonated={donation.amountDonated}
+              />
+            ))}
+          </div>
+        )}
       </div>
     </DefaultLayout>
   );
 };
 
-export default Discover;
+export default DonationHistory;

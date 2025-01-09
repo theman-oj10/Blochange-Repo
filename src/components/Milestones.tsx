@@ -95,6 +95,10 @@ const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount, proj
           )}
         </div>
         {milestones && milestones.map((milestone, index) => {
+          let amt = 0;
+          for (let i = 0; i <= index; i++) {
+            amt += milestones[i].amount;
+          }
           const position = (milestone.amount / goalAmount) * 100;
           return (
             <div 
