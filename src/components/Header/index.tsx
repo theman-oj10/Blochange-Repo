@@ -1,19 +1,82 @@
 import Link from "next/link";
-import DarkModeSwitcher from "./DarkModeSwitcher";
 import DropdownNotification from "./DropdownNotification";
 import DropdownUser from "./DropdownUser";
 import Image from "next/image";
 import SearchForm from "@/components/Header/SearchForm";
+import { useState, useEffect } from "react";
+import { Moon, Sun, Settings } from "lucide-react";
 
 const Header = (props: {
   sidebarOpen: string | boolean | undefined;
   setSidebarOpen: (arg0: boolean) => void;
 }) => {
+  const [darkMode, setDarkMode] = useState(false);
+
+  useEffect(() => {
+    const isDarkMode = localStorage.getItem("darkMode") === "true";
+    setDarkMode(isDarkMode);
+    if (isDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, []);
+
+  const toggleDarkMode = () => {
+    const newDarkMode = !darkMode;
+    setDarkMode(newDarkMode);
+    localStorage.setItem("darkMode", newDarkMode.toString());
+    if (newDarkMode) {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
   return (
     <header className="sticky top-0 z-999 flex w-full border-b border-stroke bg-white dark:border-stroke-dark dark:bg-gray-dark">
       <div className="flex flex-grow items-center justify-between px-4 py-5 shadow-2 md:px-5 2xl:px-10">
+        <div className="flex items-center justify-between gap-2 px-6 py-5.5 lg:py-6.5 xl:py-10">
+          <Link href="/">
+            <Image
+              width={220}  // Increased width for the logo
+              height={50}  // Increased height for the logo
+              src={"/images/logo/bloc-logo-light.png"}
+              alt="Logo"
+              priority
+              className="dark:hidden"
+              style={{ width: "auto", height: "auto" }} // Keep auto sizing
+            />
+            <Image
+              width={220}  // Increased width for the logo
+              height={50}  // Increased height for the logo
+              src={"/images/logo/bloc-logo.png"}
+              alt="Logo"
+              priority
+              className="hidden dark:block"
+              style={{ width: "auto", height: "auto" }} // Keep auto sizing
+            />
+          </Link>
+
+          <button className="block lg:hidden">
+            <svg
+              className="fill-current"
+              width="20"
+              height="18"
+              viewBox="0 0 20 18"
+              fill="none"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                d="M19 8.175H2.98748L9.36248 1.6875C9.69998 1.35 9.69998 0.825 9.36248 0.4875C9.02498 0.15 8.49998 0.15 8.16248 0.4875L0.399976 8.3625C0.0624756 8.7 0.0624756 9.225 0.399976 9.5625L8.16248 17.4375C8.31248 17.5875 8.53748 17.7 8.76248 17.7C8.98748 17.7 9.17498 17.625 9.36248 17.475C9.69998 17.1375 9.69998 16.6125 9.36248 16.275L3.02498 9.8625H19C19.45 9.8625 19.825 9.4875 19.825 9.0375C19.825 8.55 19.45 8.175 19 8.175Z"
+                fill=""
+              />
+            </svg>
+          </button>
+        </div>
+
         <div className="flex items-center gap-2 sm:gap-4 lg:hidden">
-          {/* <!-- Hamburger Toggle BTN --> */}
+          {/* Hamburger Toggle BTN */}
           <button
             aria-controls="sidebar"
             onClick={(e) => {
@@ -54,45 +117,31 @@ const Header = (props: {
               </span>
             </span>
           </button>
-          {/* <!-- Hamburger Toggle BTN --> */}
-
-          <Link className="block flex-shrink-0 lg:hidden" href="/">
-            <Image
-              width={32}
-              height={32}
-              src={"/images/logo/logo-icon.svg"}
-              alt="Logo"
-            />
-          </Link>
-        </div>
-
-        <div className="hidden xl:block">
-          <div>
-            <h1 className="mb-0.5 text-heading-5 font-bold text-dark dark:text-white">
-              Dashboard
-            </h1>
-            <p className="font-medium">Next.js Admin Dashboard Solution</p>
-          </div>
         </div>
 
         <div className="flex items-center justify-normal gap-2 2xsm:gap-4 lg:w-full lg:justify-between xl:w-auto xl:justify-normal">
           <ul className="flex items-center gap-2 2xsm:gap-4">
-            {/* <!-- Search Form --> */}
             <SearchForm />
-            {/* <!-- Search Form --> */}
 
-            {/* <!-- Dark Mode Toggle --> */}
-            <DarkModeSwitcher />
-            {/* <!-- Dark Mode Toggle --> */}
+            <button
+              onClick={toggleDarkMode}
+              className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700"
+            >
+              {darkMode ? (
+                <Sun size={20} className="text-yellow-500" />
+              ) : (
+                <Moon size={20} className="text-gray-600" />
+              )}
+            </button>
 
-            {/* <!-- Notification Menu Area --> */}
+            <Link href="/settings" className="flex h-12 w-12 items-center justify-center rounded-full bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700">
+              <Settings size={20} className="text-gray-600 dark:text-gray-400" />
+            </Link>
+
             <DropdownNotification />
-            {/* <!-- Notification Menu Area --> */}
           </ul>
 
-          {/* <!-- User Area --> */}
           <DropdownUser />
-          {/* <!-- User Area --> */}
         </div>
       </div>
     </header>

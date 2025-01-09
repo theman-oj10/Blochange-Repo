@@ -9,6 +9,8 @@ import Milestones from '@/components/Milestones';
 import TopDonors from '@/components/TopDonors';
 import ChartOne from "@/components/Charts/ChartOne";
 import Comments from '@/components/Comments';
+import Stats from '@/components/DataStats/DataStatsOne';
+import Posts from '@/components/Posts'; 
 
 // Mock data for top donors
 const topDonors = [
@@ -24,7 +26,7 @@ const comments = [
 ];
 
 // In a real application, you'd fetch this data from an API
-const getCharityDetails = (id: string) => {
+const getDonationDetails = (id: string) => {
   return {
     id,
     name: "Support Children & Youths",
@@ -47,10 +49,10 @@ const getCharityDetails = (id: string) => {
   };
 };
 
-const CharityDetails: React.FC = () => {
+const DonationDetails: React.FC = () => {
   const params = useParams();
   const id = params.id as string;
-  const charity = getCharityDetails(id);
+  const charity = getDonationDetails(id);
 
   return (
     <DefaultLayout>
@@ -103,6 +105,9 @@ const CharityDetails: React.FC = () => {
           <div className="bg-white shadow-md rounded-lg p-6 lg:col-span-2 xl:col-span-2">
             <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} />
           </div>
+          <div className="bg-white shadow-md rounded-lg p-6 lg:col-span-2 xl:col-span-2">
+            <Posts />
+          </div>
           <div className="bg-white shadow-md rounded-lg p-6">
             <ChartOne />
           </div>
@@ -117,4 +122,4 @@ const CharityDetails: React.FC = () => {
   );
 };
 
-export default CharityDetails;
+export default DonationDetails;

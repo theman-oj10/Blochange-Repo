@@ -1,7 +1,7 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
-import CharityCard from "@/components/CharityCard";
+import DonationCard from "@/components/DonationCard";
 import FilterMenu from "@/components/FilterMenu";
 import { getRandomImage } from "../unsplashApi";
 
@@ -68,7 +68,7 @@ const Discover: React.FC = () => {
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 auto-rows-fr">
           {filteredCharities.map((charity) => (
-            <CharityCard
+            <DonationCard
               key={charity.id}
               id={charity.id}
               name={charity.name}

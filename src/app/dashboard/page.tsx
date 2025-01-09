@@ -7,7 +7,7 @@ import TableOne from "@/components//Tables/TableOne";
 import MapOne from "@/components/Maps/MapOne";
 import DataStatsOne from "@/components/DataStats/DataStatsOne";
 import ChartOne from "@/components/Charts/ChartOne";
-import DefaultLayout from "@/components/Layouts/DefaultLaout";
+import DefaultLayout from "@/components/Layouts/DefaultLayout";
 
 const Dashboard: React.FC = () => {
   return (
