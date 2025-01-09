@@ -134,90 +134,61 @@ const Milestones: React.FC<MilestonesProps> = ({
             const isReached = isMilestoneReached(milestone.amount);
 
             return (
-            <div 
-              key={milestone.id} 
-              className="absolute flex flex-col items-center"
-              style={{ 
-                left: `${position}%`, 
-                transform: 'translateX(-50%)',
-                top: '3px'
-              }}
-            >
-              <button 
-                className={`w-5 h-5 rounded-full cursor-pointer transition-all duration-300 
-                  ${isActive ? 'ring-4 ring-blue-200' : ''}
-                  ${isReached ? 'bg-blue-500 border-2 border-blue-600' : 'bg-white border-2 border-blue-500'}
-                  hover:scale-110`}
-                onClick={() => handleMilestoneClick(milestone)}
-                aria-label={`Milestone ${milestone.id}`}
-              ></button>
-              <span className="text-xs font-semibold mt-2 whitespace-nowrap">
-                {showUSD 
-                  ? `$${(milestone.amount * conversionRate).toLocaleString()} USD`
-                  : `${milestone.amount.toLocaleString()} MATIC`
-                }
-              </span>
-              <span className="text-xs text-gray-500 hidden sm:inline whitespace-nowrap">
-                Milestone {milestone.id}
-              </span>
-            </div>
-          );
-        })}
+              <div 
+                key={milestone.id} 
+                className="absolute flex flex-col items-center"
+                style={{ 
+                  left: `${position}%`, 
+                  transform: 'translateX(-50%)',
+                  top: '3px'
+                }}
+              >
+                <button 
+                  className={`w-5 h-5 rounded-full cursor-pointer transition-all duration-300 
+                    ${isActive ? 'ring-4 ring-blue-200' : ''}
+                    ${isReached ? 'bg-blue-500 border-2 border-blue-600' : 'bg-white border-2 border-blue-500'}
+                    hover:scale-110`}
+                  onClick={() => handleMilestoneClick(milestone)}
+                  aria-label={`Milestone ${milestone.id}`}
+                ></button>
+                <span className="text-xs font-semibold mt-2 whitespace-nowrap">
+                  {showUSD 
+                    ? `$${(milestone.amount * conversionRate).toLocaleString()} USD`
+                    : `${milestone.amount.toLocaleString()} MATIC`
+                  }
+                </span>
+                <span className="text-xs text-gray-500 hidden sm:inline whitespace-nowrap">
+                  Milestone {milestone.id}
+                </span>
+              </div>
+            );
+          })}
         </div>
       </div>
 
-      {/* Milestone Details Section */}
+       {/* Milestone Details Section */}
       {selectedMilestone && (
         <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
           <div className="p-6 space-y-8">
-            {/* Header */}
-            <div className="flex justify-between items-start">
-              <h3 className="text-xl font-semibold text-gray-800">
-                Milestone {selectedMilestone.id}
-                <p className="text-gray-600 mt-1">
-                  {formatAmount(selectedMilestone.amount)}
-                </p>
-              </h3>
-            </div>
-
-            {/* Content Grid: Description on left, Voting on right */}
+            {/* Header with Title, Description, and Voting */}
             <div className="grid grid-cols-2 gap-8">
-              {/* Left Column - Description */}
+              {/* Left Column - Title and Description */}
               <div className="space-y-6">
                 <div>
-                  <h4 className="font-semibold text-gray-700 mb-2">Description</h4>
-                  <p className="text-gray-600">{selectedMilestone.description}</p>
-                </div>
-
-                {/* Work Done Section */}
-                <div className="space-y-6">
-                  <h4 className="font-semibold text-gray-700">Work Done</h4>
-                  <textarea
-                    className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg resize-none bg-gray-50"
-                    value={selectedMilestone.workDone || 'No work reported yet'}
-                    readOnly
-                  />
-
-                  {selectedMilestone.proofImages && selectedMilestone.proofImages.length > 0 && (
-                    <div>
-                      <h4 className="font-semibold text-gray-700 mb-3">Proof Images</h4>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                        {selectedMilestone.proofImages.map((image, index) => (
-                          <div key={index} className="relative aspect-video">
-                            <img
-                              src={image}
-                              alt={`Proof ${index + 1}`}
-                              className="w-full h-full object-cover rounded-lg shadow-sm"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Milestone {selectedMilestone.id}
+                    <p className="text-gray-600 mt-1">
+                      {formatAmount(selectedMilestone.amount)}
+                    </p>
+                  </h3>
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-gray-700 mb-2">Description</h4>
+                    <p className="text-gray-600">{selectedMilestone.description}</p>
+                  </div>
                 </div>
               </div>
 
-              {/* Right Column - Voting */}
+              {/* Right Column - Voting (now shown for all milestones) */}
               <div>
                 <MilestoneVoting
                   votesFor={selectedMilestone.votesFor}
@@ -232,6 +203,33 @@ const Milestones: React.FC<MilestonesProps> = ({
                   }}
                 />
               </div>
+            </div>
+
+            {/* Work Done Section */}
+            <div className="space-y-6">
+              <h4 className="font-semibold text-gray-700">Work Done</h4>
+              <textarea
+                className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg resize-none bg-gray-50"
+                value={selectedMilestone.workDone || 'No work reported yet'}
+                readOnly
+              />
+
+              {selectedMilestone.proofImages && selectedMilestone.proofImages.length > 0 && (
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-3">Proof Images</h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    {selectedMilestone.proofImages.map((image, index) => (
+                      <div key={index} className="relative aspect-video">
+                        <img
+                          src={image}
+                          alt={`Proof ${index + 1}`}
+                          className="w-full h-full object-cover rounded-lg shadow-sm"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             <hr className="border-gray-200" />

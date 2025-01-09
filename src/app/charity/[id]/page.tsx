@@ -9,6 +9,7 @@ import TopDonors from '@/components/TopDonors';
 import ChartOne from "@/components/Charts/ChartOne";
 import Comments from '@/components/Comments';
 import Donate from "@/components/Project/Donate";
+import CharityStats from '@/components/CharityStats';
 
 const CharityDetails = () => {
   const { id } = useParams();
@@ -59,10 +60,20 @@ const CharityDetails = () => {
   };
 
   const formatAmount = (maticAmount) => {
+    if (!maticAmount) return showUSD ? '$0.00 USD' : '0.00 MATIC';
+    
     if (showUSD) {
-      return `$${convertMaticToUSD(maticAmount)} USD`;
+      const usdAmount = convertMaticToUSD(maticAmount);
+      return `$${parseFloat(usdAmount).toLocaleString('en-US', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      })} USD`;
     }
-    return `${maticAmount} MATIC`;
+    
+    return `${parseFloat(maticAmount).toLocaleString('en-US', {
+      minimumFractionDigits: 2,
+      maximumFractionDigits: 2
+    })} MATIC`;
   };
 
   const CurrencyToggle = () => (
@@ -114,7 +125,8 @@ const CharityDetails = () => {
   
   return (
     <DefaultLayout>
-      <div className="container mx-auto py-8 px-4 space-y-12">
+      <div className="container mx-auto py-8 px-4 space-y-8">
+        {/* Header */}
         <div className="flex justify-between items-center">
           <h1 className="text-3xl font-bold text-gray-700">{charity.projectName}</h1>
           <div className="flex items-center space-x-4">
@@ -132,53 +144,67 @@ const CharityDetails = () => {
           </div>
         </div>
         
+        {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          <div>
+          {/* Left Column - Image and Stats */}
+          <div className="space-y-6">
             <Image 
               src='/africa.jpg'
               alt={charity.projectName} 
               width={600} 
               height={400} 
-              className="rounded-lg shadow-md"
+              className="rounded-lg shadow-md w-full"
+            />
+            
+            <CharityStats
+              totalDonors={charity.onChainData.totalDonors}
+              daysLeft={100}
+              rating={4.9}
+              launchDate="Jan 2024"
+              location="Lagos, Nigeria"
+              impactCount={100}
             />
           </div>
+
+          {/* Right Column - Description and Donate */}
           <div>
-            <p className="text-gray-600 mb-4">{charity.description}</p>
-            <div className="bg-gray-100 p-4 rounded-lg mb-4">
-              <div className="flex justify-between items-center mb-2">
-                <span className="text-green-600 font-semibold">
-                  {formatAmount(charity.raisedAmount)} raised
-                </span>
-                <span className="text-gray-500">
-                  of {formatAmount(charity.goalAmount)}
-                </span>
+            <p className="text-gray-600">{charity.description}</p>
+            
+            <div className="mt-6">
+              <div className="bg-gray-100 p-4 rounded-lg mb-4">
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-green-600 font-semibold">
+                    {formatAmount(charity.raisedAmount)} raised
+                  </span>
+                  <span className="text-gray-500">
+                    of {formatAmount(charity.goalAmount)}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                  <div 
+                    className="bg-green-600 h-2.5 rounded-full transition-all duration-300" 
+                    style={{
+                      width: `${Math.min((charity.raisedAmount / charity.goalAmount) * 100, 100)}%`
+                    }}
+                  />
+                </div>
               </div>
-              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                <div 
-                  className="bg-green-600 h-2.5 rounded-full" 
-                  style={{width: `${(charity.raisedAmount / (charity.goalAmount)) * 100}%`}}
-                />
-              </div>
-              <div className="flex justify-between text-sm text-gray-500">
-                <span>{charity.onChainData.totalDonors} donors</span>
-                <span>{charity.daysLeft} days left</span>
-              </div>
-            </div>
-            <section style={{ marginTop: '40px' }}>
+              
               <Donate projectId={charity._id} />
-            </section>
+            </div>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8">
+        {/* Milestones and Other Sections */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8 mt-8">
           <div className="bg-white shadow-md rounded-lg px-10 lg:col-span-2 xl:col-span-2">
             <Milestones 
               milestones={charity.milestones} 
-              currentAmount={charity.raisedAmount} // Keep original MATIC values
+              currentAmount={charity.raisedAmount}
               projectId={id} 
-              goalAmount={charity.goalAmount}  // Keep original MATIC values
-              conversionRate={conversionRate}  // Add this
-              showUSD={showUSD}  // Add this
+              goalAmount={charity.goalAmount}
+              conversionRate={conversionRate}
+              showUSD={showUSD}
             />
           </div>
           <div className="bg-white shadow-md rounded-lg p-4">
