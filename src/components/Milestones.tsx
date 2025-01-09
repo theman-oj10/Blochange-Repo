@@ -2,8 +2,9 @@ import React, { useState, useContext, useEffect } from 'react';
 import { Web3Context } from '@/contexts/Web3Context';
 import Posts from '@/components/Posts';
 import MilestoneVoting from '@/components/MilestoneVoting';
-import MilestoneTransactions from '@/components/MilestoneTransactions';
-import { FileText, CheckCircle2, CircleDashed, AlertCircle, Clock } from 'lucide-react';
+import { FileText, CheckCircle2, AlertCircle, Clock } from 'lucide-react';
+import WorkDoneDetails from './WorkDoneDetails';
+import TransactionList from './TransactionList';
 
 interface Milestone {
   id: number;
@@ -14,6 +15,30 @@ interface Milestone {
   votesFor: number;
   votesAgainst: number;
   posts: any;
+  totalDonors?: number;
+}
+
+interface Transaction {
+  id: string;
+  amount: number;
+  timestamp: number;
+  workDone: string;
+  status: 'completed' | 'pending';
+  type: 'withdrawal' | 'deposit' | 'payment';
+  txHash: string;
+  receipts: {
+    id: string;
+    title: string;
+    amount: number;
+    date: string;
+    url: string;
+  }[];
+  workImages: {
+    id: string;
+    title: string;
+    url: string;
+    description: string;
+  }[];
 }
 
 interface MilestonesProps {
@@ -40,7 +65,77 @@ const Milestones: React.FC<MilestonesProps> = ({
   const [selectedMilestoneId, setSelectedMilestoneId] = useState(milestones[0]?.id);
   const [votingStatus, setVotingStatus] = useState<string | null>(null);
   const [isVoting, setIsVoting] = useState(false);
-  
+  const [selectedTransaction, setSelectedTransaction] = useState<string | null>(null);
+
+  // Example transaction data - replace with your actual data source
+  const transactions: Transaction[] = [
+    {
+      id: '1',
+      amount: 1000,
+      timestamp: Date.now() - 86400000,
+      workDone: "Completed initial research and planning phase. Created detailed project timeline and resource allocation plan.",
+      status: 'completed',
+      type: 'withdrawal',
+      txHash: '0x1234567890abcdef1234567890abcdef1234567890abcdef1234567890abcdef',
+      receipts: [
+        {
+          id: 'r1',
+          title: 'Research Materials',
+          amount: 500,
+          date: '2024-01-15',
+          url: '/receipts/r1.pdf'
+        },
+        {
+          id: 'r2',
+          title: 'Development Tools',
+          amount: 500,
+          date: '2024-01-16',
+          url: '/receipts/r2.pdf'
+        }
+      ],
+      workImages: [
+        {
+          id: 'i1',
+          title: 'Project Timeline',
+          url: '/images/timeline.jpg',
+          description: 'Detailed project timeline showing key milestones and deliverables'
+        },
+        {
+          id: 'i2',
+          title: 'Resource Allocation',
+          url: '/images/resources.jpg',
+          description: 'Resource allocation chart showing team assignments and responsibilities'
+        }
+      ]
+    },
+    {
+      id: '2',
+      amount: 2000,
+      timestamp: Date.now() - 172800000,
+      workDone: "Developed core functionality including user authentication and database schema.",
+      status: 'completed',
+      type: 'withdrawal',
+      txHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
+      receipts: [
+        {
+          id: 'r3',
+          title: 'Development Contract',
+          amount: 2000,
+          date: '2024-01-17',
+          url: '/receipts/r3.pdf'
+        }
+      ],
+      workImages: [
+        {
+          id: 'i3',
+          title: 'Authentication Flow',
+          url: '/images/auth-flow.jpg',
+          description: 'User authentication flow diagram and implementation'
+        }
+      ]
+    }
+  ];
+
   const progress = Math.min((currentAmount / goalAmount) * 100, 100);
 
   const getMilestoneStatus = (milestone: Milestone) => {
@@ -98,6 +193,7 @@ const Milestones: React.FC<MilestonesProps> = ({
   };
 
   const selectedMilestone = milestones.find(m => m.id === selectedMilestoneId);
+  
   const formatAmount = (amount: number) => {
     if (showUSD) {
       const usdAmount = amount * conversionRate;
@@ -158,11 +254,11 @@ const Milestones: React.FC<MilestonesProps> = ({
     }
   }, [milestones, selectedMilestoneId]);
 
-   return (
+  return (
     <div className="mt-8 mb-8 w-full space-y-8">
+      {/* Milestones Progress Bar */}
       <div>
         <h2 className="text-2xl font-bold mb-4 text-gray-700">Milestones</h2>
-
         <div className="relative pt-2 pb-12">
           <div 
             className="h-3 bg-gray-300 rounded-full w-full cursor-pointer"
@@ -172,7 +268,7 @@ const Milestones: React.FC<MilestonesProps> = ({
             <div
               className="absolute left-0 h-3 bg-blue-500 rounded-full transition-all duration-300"
               style={{ width: `${progress}%` }}
-            ></div>
+            />
             {hoverTooltip.show && (
               <div 
                 className="absolute bottom-full mb-2 bg-white shadow-lg border border-gray-200 rounded px-3 py-1 text-sm font-semibold text-blue-500 transform -translate-x-1/2"
@@ -183,6 +279,7 @@ const Milestones: React.FC<MilestonesProps> = ({
             )}
           </div>
 
+          {/* Milestone Markers */}
           {milestones.map((milestone) => {
             const position = (milestone.amount / goalAmount) * 100;
             const isActive = selectedMilestoneId === milestone.id;
@@ -205,7 +302,7 @@ const Milestones: React.FC<MilestonesProps> = ({
                     hover:scale-110`}
                   onClick={() => handleMilestoneClick(milestone)}
                   aria-label={`Milestone ${milestone.id}`}
-                ></button>
+                />
                 <span className="text-xs font-semibold mt-2 whitespace-nowrap">
                   {showUSD 
                     ? `$${(milestone.amount * conversionRate).toLocaleString()} USD`
@@ -221,108 +318,103 @@ const Milestones: React.FC<MilestonesProps> = ({
         </div>
       </div>
 
-     {/* Milestone Details Section */}
-    {selectedMilestone && (
-      <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-        <div className="p-6 space-y-8">
-          {/* Header with Title, Status, Description, and Voting */}
-          <div className="grid grid-cols-2 gap-8">
-            {/* Left Column */}
-            <div className="space-y-6">
-              <div>
-                <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    Milestone {selectedMilestone.id}
-                    <p className="text-gray-600 mt-1">
-                      {formatAmount(selectedMilestone.amount)}
-                    </p>
-                  </h3>
-                  
-                  {/* Status Badge */}
-                  {(() => {
-                    const status = getMilestoneStatus(selectedMilestone);
-                    const StatusIcon = status.icon;
+      {/* Milestone Details Section */}
+      {selectedMilestone && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div className="p-6 space-y-8">
+            {/* Header with Title, Status, Description, and Voting */}
+            <div className="grid grid-cols-2 gap-8">
+              {/* Left Column */}
+              <div className="space-y-6">
+                <div>
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-xl font-semibold text-gray-800">
+                      Milestone {selectedMilestone.id}
+                      <p className="text-gray-600 mt-1">
+                        {formatAmount(selectedMilestone.amount)}
+                      </p>
+                    </h3>
                     
-                    return (
-                      <div className={`inline-flex items-center px-4 py-2 rounded-lg ${status.bgColor} ${status.borderColor} border`}>
-                        <StatusIcon className={`w-5 h-5 mr-2 ${status.textColor}`} />
-                        <span className={`text-sm font-medium ${status.textColor}`}>
-                          {status.label}
-                        </span>
-                      </div>
-                    );
-                  })()}
+                    {/* Status Badge */}
+                    {(() => {
+                      const status = getMilestoneStatus(selectedMilestone);
+                      const StatusIcon = status.icon;
+                      
+                      return (
+                        <div className={`inline-flex items-center px-4 py-2 rounded-lg ${status.bgColor} ${status.borderColor} border`}>
+                          <StatusIcon className={`w-5 h-5 mr-2 ${status.textColor}`} />
+                          <span className={`text-sm font-medium ${status.textColor}`}>
+                            {status.label}
+                          </span>
+                        </div>
+                      );
+                    })()}
+                  </div>
+                  <div className="mt-4">
+                    <h4 className="font-semibold text-gray-700 mb-2">Description</h4>
+                    <p className="text-gray-600">{selectedMilestone.description}</p>
+                  </div>
                 </div>
-                <div className="mt-4">
-                  <h4 className="font-semibold text-gray-700 mb-2">Description</h4>
-                  <p className="text-gray-600">{selectedMilestone.description}</p>
-                </div>
+              </div>
+
+              {/* Right Column - Voting */}
+              <div>
+                <MilestoneVoting
+                  votesFor={selectedMilestone.votesFor}
+                  votesAgainst={selectedMilestone.votesAgainst}
+                  totalDonors={selectedMilestone.totalDonors || 0}
+                  isVoting={isVoting}
+                  isMilestoneReached={isMilestoneReached(selectedMilestone.amount)}
+                  onVoteFor={() => castVote(selectedMilestone.id, true)}
+                  onVoteAgainst={() => castVote(selectedMilestone.id, false)}
+                  onRequestRevision={() => {
+                    console.log('Request revision for milestone:', selectedMilestone.id);
+                  }}
+                />
               </div>
             </div>
 
-            {/* Right Column - Voting */}
+            {/* Work Done and Transactions Section */}
+            <div className="space-y-6">
+              <div className="grid grid-cols-2 gap-6">
+                {/* Left Column - Transactions */}
+                <TransactionList
+                  transactions={transactions}
+                  selectedTransaction={selectedTransaction}
+                  onTransactionSelect={setSelectedTransaction}
+                  formatAmount={formatAmount}
+                />
+
+                {/* Right Column - Work Done Details */}
+                <div>
+                  <h4 className="font-semibold text-gray-700 mb-4">Work Done Details</h4>
+                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+                    <WorkDoneDetails 
+                      transaction={transactions.find(t => t.id === selectedTransaction)}
+                      formatAmount={formatAmount}
+                    />
+                  </div>
+                </div>
+              </div>
+
+          {/* Proof Images Section */}
+          {selectedMilestone.proofImages && selectedMilestone.proofImages.length > 0 && (
             <div>
-              <MilestoneVoting
-                votesFor={selectedMilestone.votesFor}
-                votesAgainst={selectedMilestone.votesAgainst}
-                totalDonors={selectedMilestone.totalDonors || 0}
-                isVoting={isVoting}
-                isMilestoneReached={isMilestoneReached(selectedMilestone.amount)}
-                onVoteFor={() => castVote(selectedMilestone.id, true)}
-                onVoteAgainst={() => castVote(selectedMilestone.id, false)}
-                onRequestRevision={() => {
-                  console.log('Request revision for milestone:', selectedMilestone.id);
-                }}
-              />
-            </div>
-          </div>
-
-          {/* Work Done and Transactions Section */}
-          <div className="space-y-6">
-            <div className="grid grid-cols-2 gap-6">
-              {/* Left Column - Work Done */}
-              <div>
-                <h4 className="font-semibold text-gray-700 mb-4">Work Done</h4>
-                <textarea
-                  className="w-full min-h-[400px] p-3 border border-gray-300 rounded-lg resize-none bg-gray-50"
-                  value={selectedMilestone.workDone || 'No work reported yet'}
-                  readOnly
-                />
-              </div>
-              
-              {/* Right Column - Transactions */}
-              <div>
-                <h4 className="font-semibold text-gray-700 mb-4">
-                  <span className="flex items-center gap-2">
-                    <FileText className="w-4 h-4" />
-                    Milestone Transactions
-                  </span>
-                </h4>
-                <MilestoneTransactions 
-                  contractAddress={contract?.address}
-                  milestoneId={selectedMilestone.id}
-                />
+              <h4 className="font-semibold text-gray-700 mb-3">Proof Images</h4>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                {selectedMilestone.proofImages.map((image, index) => (
+                  <div key={index} className="relative aspect-video">
+                    <img
+                      src={image}
+                      alt={`Proof ${index + 1}`}
+                      className="w-full h-full object-cover rounded-lg shadow-sm"
+                    />
+                  </div>
+                ))}
               </div>
             </div>
-
-  {/* Proof Images Section */}
-  {selectedMilestone.proofImages && selectedMilestone.proofImages.length > 0 && (
-    <div>
-      <h4 className="font-semibold text-gray-700 mb-3">Proof Images</h4>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        {selectedMilestone.proofImages.map((image, index) => (
-          <div key={index} className="relative aspect-video">
-            <img
-              src={image}
-              alt={`Proof ${index + 1}`}
-              className="w-full h-full object-cover rounded-lg shadow-sm"
-            />
-          </div>
-        ))}
-      </div>
-    </div>
-  )}
-</div>
+          )}
+        </div>
 
           <hr className="border-gray-200" />
 
