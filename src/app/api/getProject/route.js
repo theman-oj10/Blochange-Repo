@@ -1,5 +1,3 @@
-// /app/api/getProject/route.js
-
 import { NextResponse } from 'next/server';
 import connectToDatabase from '../../../utils/mongodb';
 import { ethers } from 'ethers';
@@ -19,6 +17,7 @@ export async function GET(request) {
     const client = await connectToDatabase();
     const db = client.db('charityDB');
     const projects = db.collection('projects');
+    const comments = db.collection('comments');
 
     const project = await projects.findOne({ _id: id });
     if (!project) {
@@ -35,7 +34,7 @@ export async function GET(request) {
     const currentMilestoneId = projectOnChain.currentMilestone;
 
     for (let i = 1; i <= currentMilestoneId; i++) {
-      let milestoneData
+      let milestoneData;
       try {
         milestoneData = await contract.getMilestone(projectI, i);
       } catch (error) {
@@ -43,14 +42,26 @@ export async function GET(request) {
         break; // no more milestones after this, break;
       }
 
+      const milestonePosts = await comments.find({ milestoneId: i }).toArray(); 
+
       milestones.push({
         id: Number(milestoneData.id),
         description: milestoneData.description,
         amount: ethers.formatEther(milestoneData.amount),
         fundsRaised: ethers.formatEther(projectOnChain.totalDonations),
         achieved: milestoneData.achieved,
+        workDone: "Work done",
+        votesFor: milestoneData.totalVotes.toString(),
+        votesAgainst: Number(projectOnChain.totalDonors - milestoneData.totalVotes),
         votingOpen: milestoneData.votingOpen,
         totalVotes: milestoneData.totalVotes.toString(),
+        posts: milestonePosts.map((post) => ({
+          id: post._id,
+          content: post.content,
+          attachments: post.attachments,
+          createdAt: post.createdAt,
+          author: post.userId,
+        })),
       });
     }
 

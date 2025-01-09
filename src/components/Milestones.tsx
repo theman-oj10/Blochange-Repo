@@ -1,12 +1,13 @@
-import React, { useState, useContext } from 'react';
-import { ethers } from 'ethers';
-import { Web3Context } from '@/contexts/Web3Context';
-import Modal from '@/components/Modal';
+import React, { useState } from 'react';
 
 interface Milestone {
   id: number;
   amount: number;
   description: string;
+  workDone: string;
+  proofImages: string[];
+  votesFor: number;
+  votesAgainst: number;
 }
 
 interface MilestonesProps {
@@ -16,13 +17,12 @@ interface MilestonesProps {
   goalAmount: number;
 }
 
+
 const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount, projectId, goalAmount }) => {
   const [activeTooltip, setActiveTooltip] = useState<number | null>(null);
   const [hoverTooltip, setHoverTooltip] = useState({ show: false, position: 0 });
-  const [votingStatus, setVotingStatus] = useState<string | null>(null);
-  const [fundsStatus, setFundsStatus] = useState<string | null>(null);
+
   const [activeMilestone, setActiveMilestone] = useState<Milestone | null>(null);
-  const { contract, signer } = useContext(Web3Context);
   const progress = Math.min((currentAmount / goalAmount) * 100, 100);
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     const rect = e.currentTarget.getBoundingClientRect();
@@ -31,43 +31,6 @@ const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount, proj
     setHoverTooltip({ show: true, position });
   };
 
-  // Voting function
-  const castVote = async (milestoneId: number, vote: boolean) => {
-    try {
-      if (!contract) {
-        setVotingStatus('Error: Contract or signer not found.');
-        return;
-      }
-
-      setVotingStatus(`Submitting vote for milestone ${milestoneId}...`);
-      const tx = await contract.vote(projectId, milestoneId);
-      await tx.wait();
-      setVotingStatus(`Vote submitted successfully for milestone ${milestoneId}`);
-    } catch (error) {
-      console.error('Error casting vote:', error);
-      setVotingStatus(`Failed to cast vote for milestone ${milestoneId}`);
-    }
-  };
-
-  // Function to release funds
-  const releaseFunds = async (milestoneId: number) => {
-    try {
-      if (!contract) {
-        setFundsStatus('Error: Contract or signer not found.');
-        return;
-      }
-
-      setFundsStatus(`Releasing funds for milestone ${milestoneId}...`);
-      const tx = await contract.releaseFunds(projectId, milestoneId);
-      await tx.wait();
-      setFundsStatus(`Funds released successfully for milestone ${milestoneId}`);
-    } catch (error) {
-      console.error('Error releasing funds:', error);
-      setFundsStatus(`Failed to release funds for milestone ${milestoneId}`);
-    }
-  };
-
-  // Open modal on milestone click
   const handleMilestoneClick = (milestone: Milestone) => {
     setActiveMilestone(milestone);
   };
@@ -75,6 +38,8 @@ const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount, proj
   return (
     <div className="mt-8 mb-8 w-full">
       <h2 className="text-2xl font-bold mb-4 text-gray-700">Milestones</h2>
+
+      {/* Progress Bar */}
       <div className="relative pt-2 pb-12">
         <div 
           className="h-3 bg-gray-300 rounded-full w-full cursor-pointer"
@@ -94,6 +59,7 @@ const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount, proj
             </div>
           )}
         </div>
+
         {milestones && milestones.map((milestone, index) => {
           let amt = 0;
           for (let i = 0; i <= index; i++) {
@@ -112,52 +78,14 @@ const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount, proj
             >
               <div 
                 className="w-5 h-5 bg-white border-2 border-blue-500 rounded-full cursor-pointer"
-                onClick={() => handleMilestoneClick(milestone)} // Click to open modal
+                onClick={() => handleMilestoneClick(milestone)}
               ></div>
               <span className="text-xs font-semibold mt-2 whitespace-nowrap">${milestone.amount}</span>
               <span className="text-xs text-gray-500 hidden sm:inline whitespace-nowrap">Milestone {milestone.id}</span>
-              {activeTooltip === milestone.id && (
-                <div className="absolute top-full mt-2 bg-white shadow-lg border border-gray-200 rounded px-3 py-2 text-xs text-gray-700 w-36 text-center z-10">
-                  {milestone.description}
-                </div>
-              )}
             </div>
           );
         })}
       </div>
-
-      {/* Modal for vote/release options */}
-      {activeMilestone && (
-        <Modal onClose={() => setActiveMilestone(null)}>
-          <div className="p-4">
-            <h3 className="text-lg font-semibold mb-2">Milestone {activeMilestone.id}</h3>
-            <p>{activeMilestone.description}</p>
-            <div className="mt-4 flex flex-col items-center">
-              <button
-                onClick={() => castVote(activeMilestone.id, true)}
-                className="bg-green-500 hover:bg-green-700 text-white font-bold py-1 px-4 rounded mb-2"
-              >
-                Vote Yes
-              </button>
-              <button
-                onClick={() => castVote(activeMilestone.id, false)}
-                className="bg-red-500 hover:bg-red-700 text-white font-bold py-1 px-4 rounded mb-2"
-              >
-                Vote No
-              </button>
-              <button
-                onClick={() => releaseFunds(activeMilestone.id)}
-                className="bg-yellow-500 hover:bg-yellow-600 text-white font-bold py-1 px-4 rounded"
-              >
-                Release Funds
-              </button>
-            </div>
-          </div>
-        </Modal>
-      )}
-
-      {votingStatus && <p className="mt-4 text-sm text-blue-600">{votingStatus}</p>}
-      {fundsStatus && <p className="mt-4 text-sm text-yellow-600">{fundsStatus}</p>}
     </div>
   );
 };

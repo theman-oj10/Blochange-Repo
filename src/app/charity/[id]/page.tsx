@@ -12,6 +12,7 @@ import ChartOne from "@/components/Charts/ChartOne";
 import Comments from '@/components/Comments';
 import Donate from "@/components/Project/Donate";
 import { getRandomImage } from '@/app/unsplashApi';
+import MilestoneBox from '@/components/MilestoneBox'
 
 const charityCategories = [
   "All",
@@ -31,7 +32,7 @@ const CharityDetails = () => {
   const [charity, setCharity] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-  
+
   useEffect(() => {
     if (!id) return; // Wait until the ID is available
 
@@ -44,12 +45,15 @@ const CharityDetails = () => {
         const data = await response.json();
         data.project.imageUrl = 'imageUrl';
         setCharity(data.project);
+        console.log(data.project)
+
       } catch (err) {
         console.error(err);
         setError(err.message);
       } finally {
         setLoading(false);
       }
+
     };
 
     fetchCharityDetails();
@@ -139,6 +143,20 @@ const CharityDetails = () => {
           <div className="bg-white shadow-md rounded-lg px-10 lg:col-span-2 xl:col-span-2">
             <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} projectId={id} goalAmount={(charity.goalAmount)} />
           </div>
+          {charity.milestones.map((milestone) => (
+            <div key={milestone.id} className="bg-white shadow-md rounded-lg p-6 lg:col-span-2 xl:col-span-2">
+              <MilestoneBox
+                id={milestone.id}
+                amount={milestone.amount}
+                description={milestone.description}
+                workDone={milestone.workDone}
+                proofImages={milestone.proofImages}
+                votesFor={milestone.votesFor}
+                votesAgainst={milestone.votesAgainst}
+                posts={milestone.posts}
+              />
+            </div>
+          ))}
           <div className="bg-white shadow-md rounded-lg p-4">
             <ChartOne />
           </div>
