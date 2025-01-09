@@ -3,7 +3,7 @@ import { Web3Context } from '@/contexts/Web3Context';
 import Posts from '@/components/Posts';
 import MilestoneVoting from '@/components/MilestoneVoting';
 import MilestoneTransactions from '@/components/MilestoneTransactions';
-import { FileText } from 'lucide-react';
+import { FileText, CheckCircle2, CircleDashed, AlertCircle, Clock } from 'lucide-react';
 
 interface Milestone {
   id: number;
@@ -42,6 +42,60 @@ const Milestones: React.FC<MilestonesProps> = ({
   const [isVoting, setIsVoting] = useState(false);
   
   const progress = Math.min((currentAmount / goalAmount) * 100, 100);
+
+  const getMilestoneStatus = (milestone: Milestone) => {
+    const progressPercent = (currentAmount / goalAmount) * 100;
+
+    if (milestone.id === 1 && progressPercent >= 33) {
+      return {
+        label: 'Completed',
+        icon: CheckCircle2,
+        textColor: 'text-green-600',
+        bgColor: 'bg-green-50',
+        borderColor: 'border-green-200'
+      };
+    } else if (milestone.id === 2 && progressPercent >= 33) {
+      return {
+        label: 'In Progress',
+        icon: Clock,
+        textColor: 'text-yellow-600',
+        bgColor: 'bg-yellow-50',
+        borderColor: 'border-yellow-200'
+      };
+    } else {
+      return {
+        label: 'Funding Required',
+        icon: AlertCircle,
+        textColor: 'text-red-600',
+        bgColor: 'bg-red-50',
+        borderColor: 'border-red-200'
+      };
+    }
+  };
+
+  const getMilestoneStyle = (milestone: Milestone) => {
+    const progressPercent = (currentAmount / goalAmount) * 100;
+    
+    if (milestone.id === 1 && progressPercent >= 33) {
+      return {
+        bgColor: 'bg-green-500',
+        borderColor: 'border-green-600',
+        ringColor: 'ring-green-200'
+      };
+    } else if (milestone.id === 2 && progressPercent >= 33) {
+      return {
+        bgColor: 'bg-yellow-400',
+        borderColor: 'border-yellow-500',
+        ringColor: 'ring-yellow-200'
+      };
+    } else {
+      return {
+        bgColor: 'bg-white',
+        borderColor: 'border-gray-300',
+        ringColor: 'ring-gray-200'
+      };
+    }
+  };
 
   const selectedMilestone = milestones.find(m => m.id === selectedMilestoneId);
   const formatAmount = (amount: number) => {
@@ -97,92 +151,108 @@ const Milestones: React.FC<MilestonesProps> = ({
       setIsVoting(false);
     }
   };
-
+  
   useEffect(() => {
     if (selectedMilestoneId && !milestones.find(m => m.id === selectedMilestoneId)) {
       setSelectedMilestoneId(milestones[0]?.id);
     }
   }, [milestones, selectedMilestoneId]);
 
-  return (
-  <div className="mt-8 mb-8 w-full space-y-8">
-    <div>
-      <h2 className="text-2xl font-bold mb-4 text-gray-700">Milestones</h2>
+   return (
+    <div className="mt-8 mb-8 w-full space-y-8">
+      <div>
+        <h2 className="text-2xl font-bold mb-4 text-gray-700">Milestones</h2>
 
-      {/* Progress Bar */}
-      <div className="relative pt-2 pb-12">
-        <div 
-          className="h-3 bg-gray-300 rounded-full w-full cursor-pointer"
-          onMouseMove={handleMouseMove}
-          onMouseLeave={() => setHoverTooltip({ show: false, position: 0 })}
-        >
-          <div
-            className="absolute left-0 h-3 bg-blue-500 rounded-full transition-all duration-300"
-            style={{ width: `${progress}%` }}
-          ></div>
-          {hoverTooltip.show && (
-            <div 
-              className="absolute bottom-full mb-2 bg-white shadow-lg border border-gray-200 rounded px-3 py-1 text-sm font-semibold text-blue-500 transform -translate-x-1/2"
-              style={{ left: `${hoverTooltip.position}%` }}
-            >
-              {formatAmount(currentAmount)} raised
-            </div>
-          )}
+        <div className="relative pt-2 pb-12">
+          <div 
+            className="h-3 bg-gray-300 rounded-full w-full cursor-pointer"
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => setHoverTooltip({ show: false, position: 0 })}
+          >
+            <div
+              className="absolute left-0 h-3 bg-blue-500 rounded-full transition-all duration-300"
+              style={{ width: `${progress}%` }}
+            ></div>
+            {hoverTooltip.show && (
+              <div 
+                className="absolute bottom-full mb-2 bg-white shadow-lg border border-gray-200 rounded px-3 py-1 text-sm font-semibold text-blue-500 transform -translate-x-1/2"
+                style={{ left: `${hoverTooltip.position}%` }}
+              >
+                {formatAmount(currentAmount)} raised
+              </div>
+            )}
+          </div>
+
+          {milestones.map((milestone) => {
+            const position = (milestone.amount / goalAmount) * 100;
+            const isActive = selectedMilestoneId === milestone.id;
+            const style = getMilestoneStyle(milestone);
+
+            return (
+              <div 
+                key={milestone.id} 
+                className="absolute flex flex-col items-center"
+                style={{ 
+                  left: `${position}%`, 
+                  transform: 'translateX(-50%)',
+                  top: '3px'
+                }}
+              >
+                <button 
+                  className={`w-5 h-5 rounded-full cursor-pointer transition-all duration-300 
+                    ${isActive ? `ring-4 ${style.ringColor}` : ''}
+                    ${style.bgColor} border-2 ${style.borderColor}
+                    hover:scale-110`}
+                  onClick={() => handleMilestoneClick(milestone)}
+                  aria-label={`Milestone ${milestone.id}`}
+                ></button>
+                <span className="text-xs font-semibold mt-2 whitespace-nowrap">
+                  {showUSD 
+                    ? `$${(milestone.amount * conversionRate).toLocaleString()} USD`
+                    : `${milestone.amount.toLocaleString()} MATIC`
+                  }
+                </span>
+                <span className="text-xs text-gray-500 hidden sm:inline whitespace-nowrap">
+                  Milestone {milestone.id}
+                </span>
+              </div>
+            );
+          })}
         </div>
-
-        {milestones.map((milestone) => {
-          const position = (milestone.amount / goalAmount) * 100;
-          const isActive = selectedMilestoneId === milestone.id;
-          const isReached = isMilestoneReached(milestone.amount);
-
-          return (
-            <div 
-              key={milestone.id} 
-              className="absolute flex flex-col items-center"
-              style={{ 
-                left: `${position}%`, 
-                transform: 'translateX(-50%)',
-                top: '3px'
-              }}
-            >
-              <button 
-                className={`w-5 h-5 rounded-full cursor-pointer transition-all duration-300 
-                  ${isActive ? 'ring-4 ring-blue-200' : ''}
-                  ${isReached ? 'bg-blue-500 border-2 border-blue-600' : 'bg-white border-2 border-blue-500'}
-                  hover:scale-110`}
-                onClick={() => handleMilestoneClick(milestone)}
-                aria-label={`Milestone ${milestone.id}`}
-              ></button>
-              <span className="text-xs font-semibold mt-2 whitespace-nowrap">
-                {showUSD 
-                  ? `$${(milestone.amount * conversionRate).toLocaleString()} USD`
-                  : `${milestone.amount.toLocaleString()} MATIC`
-                }
-              </span>
-              <span className="text-xs text-gray-500 hidden sm:inline whitespace-nowrap">
-                Milestone {milestone.id}
-              </span>
-            </div>
-          );
-        })}
       </div>
-    </div>
 
-    {/* Milestone Details Section */}
+     {/* Milestone Details Section */}
     {selectedMilestone && (
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
         <div className="p-6 space-y-8">
-          {/* Header with Title, Description, and Voting */}
+          {/* Header with Title, Status, Description, and Voting */}
           <div className="grid grid-cols-2 gap-8">
-            {/* Left Column - Title and Description */}
+            {/* Left Column */}
             <div className="space-y-6">
               <div>
-                <h3 className="text-xl font-semibold text-gray-800">
-                  Milestone {selectedMilestone.id}
-                  <p className="text-gray-600 mt-1">
-                    {formatAmount(selectedMilestone.amount)}
-                  </p>
-                </h3>
+                <div className="flex items-center justify-between mb-4">
+                  <h3 className="text-xl font-semibold text-gray-800">
+                    Milestone {selectedMilestone.id}
+                    <p className="text-gray-600 mt-1">
+                      {formatAmount(selectedMilestone.amount)}
+                    </p>
+                  </h3>
+                  
+                  {/* Status Badge */}
+                  {(() => {
+                    const status = getMilestoneStatus(selectedMilestone);
+                    const StatusIcon = status.icon;
+                    
+                    return (
+                      <div className={`inline-flex items-center px-4 py-2 rounded-lg ${status.bgColor} ${status.borderColor} border`}>
+                        <StatusIcon className={`w-5 h-5 mr-2 ${status.textColor}`} />
+                        <span className={`text-sm font-medium ${status.textColor}`}>
+                          {status.label}
+                        </span>
+                      </div>
+                    );
+                  })()}
+                </div>
                 <div className="mt-4">
                   <h4 className="font-semibold text-gray-700 mb-2">Description</h4>
                   <p className="text-gray-600">{selectedMilestone.description}</p>
