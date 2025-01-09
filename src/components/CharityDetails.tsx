@@ -3,11 +3,12 @@ import React from 'react';
 import { useParams } from 'next/navigation';
 import DefaultLayout from "@/components/Layouts/DefaultLaout";
 import Image from 'next/image';
-import TableOne from "@/components/Tables/TableOne";
-import { UserCircle } from 'lucide-react';
-import Link from 'next/link';
 import profilePic from '../../public/images/team/team-01.png';
 import Milestones from '@/components/Milestones';
+import TopDonors from '@/components/TopDonors';
+import ChartOne from "@/components/Charts/ChartOne";
+import Comments from '@/components/Comments';
+
 
 // Mock data for top donors
 const topDonors = [
@@ -24,7 +25,6 @@ const comments = [
 
 // In a real application, you'd fetch this data from an API
 const getCharityDetails = (id: string) => {
-  // This is mock data. Replace with actual API call in a real application.
   return {
     id,
     name: "Support Children & Youths",
@@ -34,11 +34,9 @@ const getCharityDetails = (id: string) => {
     goalAmount: 9988,
     daysLeft: 2,
     donorCount: 8,
-    category: "Education",
     beneficiary: {
       name: "John Smith",
-      profilePic: profilePic,
-      profileLink: "/beneficiary/john-smith"
+      profilePic: profilePic
     },
     milestones: [
       { id: 1, amount: 2000, description: "Initial funding for program setup" },
@@ -56,20 +54,21 @@ const CharityDetails: React.FC = () => {
 
   return (
     <DefaultLayout>
-      <div className="container mx-auto px-4 py-8">
-        <div className="flex items-center justify-between mb-6">
-          <h1 className="text-3xl font-bold">{charity.name}</h1>
-          <Link href={charity.beneficiary.profileLink} className="flex items-center">
-            <span>{charity.beneficiary.name}</span>
+      <div className="container mx-auto py-8 px-4 space-y-12">
+        <div className="flex justify-between items-center">
+          <h1 className="text-3xl font-bold text-gray-700">{charity.name}</h1>
+          <div className="flex items-center">
+            <span className="mr-2">{charity.beneficiary.name}</span>
             <Image 
               src={charity.beneficiary.profilePic} 
               alt={charity.beneficiary.name} 
-              width={50} 
-              height={50} 
-              className="rounded-full ml-4"
+              width={40} 
+              height={40} 
+              className="rounded-full"
             />
-          </Link>
+          </div>
         </div>
+        
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <Image 
@@ -87,7 +86,9 @@ const CharityDetails: React.FC = () => {
                 <span className="text-green-600 font-semibold">${charity.raisedAmount} raised</span>
                 <span className="text-gray-500">of ${charity.goalAmount}</span>
               </div>
-              <progress value={charity.raisedAmount} max={charity.goalAmount} className="w-full mb-2"></progress>
+              <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
+                <div className="bg-green-600 h-2.5 rounded-full" style={{width: `${(charity.raisedAmount / charity.goalAmount) * 100}%`}}></div>
+              </div>
               <div className="flex justify-between text-sm text-gray-500">
                 <span>{charity.donorCount} donors</span>
                 <span>{charity.daysLeft} days left</span>
@@ -98,38 +99,19 @@ const CharityDetails: React.FC = () => {
             </button>
           </div>
         </div>
-        <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} />
-
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-4">Top Donors</h2>
-          <TableOne />
-        </div>
-
-        <div className="mt-12">
-          <h2 className="text-2xl font-bold mb-4">Comments</h2>
-          <div className="space-y-4">
-            {comments.map((comment) => (
-              <div key={comment.id} className="bg-gray-100 p-4 rounded-lg">
-                <div className="flex items-center mb-2">
-                  <UserCircle className="mr-2" />
-                  <span className="font-semibold">{comment.user}</span>
-                  <span className="text-gray-500 text-sm ml-2">{comment.date}</span>
-                </div>
-                <p>{comment.text}</p>
-              </div>
-            ))}
+        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8">
+          <div className="bg-white shadow-md rounded-lg p-6 lg:col-span-2 xl:col-span-2">
+            <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} />
           </div>
-          <div className="mt-4">
-            <textarea 
-              className="w-full p-2 border rounded-lg" 
-              rows={3} 
-              placeholder="Leave a comment..."
-            ></textarea>
-            <button className="mt-2 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors">
-              Post Comment
-            </button>
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <ChartOne />
+          </div>
+          <div className="bg-white shadow-md rounded-lg p-6">
+            <TopDonors />
           </div>
         </div>
+
+        <Comments />
       </div>
     </DefaultLayout>
   );

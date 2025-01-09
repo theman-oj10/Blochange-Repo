@@ -12,38 +12,68 @@ interface MilestonesProps {
 }
 
 const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount }) => {
-  const [expandedMilestone, setExpandedMilestone] = useState<number | null>(null);
+  const [activeTooltip, setActiveTooltip] = useState<number | null>(null);
+  const [hoverTooltip, setHoverTooltip] = useState({ show: false, position: 0 });
 
   const totalAmount = milestones[milestones.length - 1].amount;
-  const progress = (currentAmount / totalAmount) * 100;
+  const progress = Math.min((currentAmount / totalAmount) * 100, 100);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const rect = e.currentTarget.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const position = (x / rect.width) * 100;
+    setHoverTooltip({ show: true, position });
+  };
 
   return (
-    <div className="mt-8 w-full">
-      <h2 className="text-2xl font-bold mb-6 text-gray-700">Milestones</h2>
-      <div className="relative">
-        <div className="absolute left-0 right-0 h-2 bg-gray-200 rounded-full">
+    <div className="mt-8 mb-8 w-full">
+      <h2 className="text-2xl font-bold mb-4 text-gray-700">Milestones</h2>
+      <div className="relative pt-2 pb-12"> {/* Adjusted padding */}
+        <div 
+          className="h-2 bg-gray-200 rounded-full w-full cursor-pointer"
+          onMouseMove={handleMouseMove}
+          onMouseLeave={() => setHoverTooltip({ show: false, position: 0 })}
+        >
           <div
             className="absolute left-0 h-2 bg-green-500 rounded-full"
             style={{ width: `${progress}%` }}
           ></div>
+          {hoverTooltip.show && (
+            <div 
+              className="absolute bottom-full mb-2 bg-white border border-gray-200 rounded px-2 py-1 text-sm font-semibold text-green-500 transform -translate-x-1/2"
+              style={{ left: `${hoverTooltip.position}%` }}
+            >
+              ${currentAmount} raised
+            </div>
+          )}
         </div>
-        <div className="relative pt-6 flex justify-between">
-          {milestones.map((milestone, index) => (
-            <div key={milestone.id} className="flex flex-col items-center">
-              <button
-                className="w-4 h-4 bg-white border-2 border-green-500 rounded-full mb-2"
-                onClick={() => setExpandedMilestone(expandedMilestone === milestone.id ? null : milestone.id)}
-              ></button>
-              <span className="text-sm font-semibold">${milestone.amount}</span>
-              <span className="text-xs text-gray-500">Milestone {index}</span>
-              {expandedMilestone === milestone.id && (
-                <div className="absolute top-12 left-1/2 transform -translate-x-1/2 w-48 bg-white p-2 rounded shadow-lg z-10 mt-2">
-                  <p className="text-sm">{milestone.description}</p>
+        {milestones.map((milestone, index) => {
+          const position = (milestone.amount / totalAmount) * 100;
+          return (
+            <div 
+              key={milestone.id} 
+              className="absolute flex flex-col items-center"
+              style={{ 
+                left: `${position}%`, 
+                transform: 'translateX(-50%)',
+                top: '3px' // I don't think this should be hardcoded
+              }}
+            >
+              <div 
+                className="w-4 h-4 bg-white border-2 border-green-500 rounded-full cursor-pointer"
+                onMouseEnter={() => setActiveTooltip(milestone.id)}
+                onMouseLeave={() => setActiveTooltip(null)}
+              ></div>
+              <span className="text-xs font-semibold mt-2 whitespace-nowrap">${milestone.amount}</span>
+              <span className="text-xs text-gray-500 hidden sm:inline whitespace-nowrap">Milestone {index}</span>
+              {activeTooltip === milestone.id && (
+                <div className="absolute top-full mt-2 bg-white border border-gray-200 rounded px-2 py-1 text-xs text-gray-700 w-32 text-center z-10">
+                  {milestone.description}
                 </div>
               )}
             </div>
-          ))}
-        </div>
+          );
+        })}
       </div>
     </div>
   );
