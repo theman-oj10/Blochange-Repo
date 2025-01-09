@@ -1,20 +1,17 @@
-import ECommerce from "@/components/Dashboard/E-commerce";
+import Discover from "@/app/discover/page";
 import { Metadata } from "next";
-import DefaultLayout from "@/components/Layouts/DefaultLaout";
 import React from "react";
 
 export const metadata: Metadata = {
   title:
-    "Next.js E-commerce Dashboard Page | NextAdmin - Next.js Dashboard Kit",
-  description: "This is Next.js Home page for NextAdmin Dashboard Kit",
+    "BlocChange",
+  description: "Change the World one block at a time",
 };
 
 export default function Home() {
   return (
     <>
-      <DefaultLayout>
-        <ECommerce />
-      </DefaultLayout>
+        <Discover />
     </>
   );
 }
