@@ -45,10 +45,8 @@ const CharityDetails = () => {
         const data = await response.json();
         data.project.imageUrl = 'imageUrl';
         setCharity(data.project);
-        console.log(data.project)
-
       } catch (err) {
-        console.error(err);
+        console.error("Error fetching charity Details:", err);
         setError(err.message);
       } finally {
         setLoading(false);
@@ -96,10 +94,9 @@ const CharityDetails = () => {
           <h1 className="text-3xl font-bold text-gray-700">{charity.projectName}</h1>
           <div className="flex items-center">
             {/* <span className="mr-2">{charity.beneficiaryName}</span> */}
-            <span className="mr-2">{"John Smith"}</span>
+            <span className="mr-2">{"Aid Africa"}</span>
             <Image 
-              // src={charity.beneficiaryProfilePic} 
-              src='/team-01.png'
+              src="/images/team-01.png"
               alt={charity.beneficiary} 
               width={40} 
               height={40} 
@@ -143,21 +140,6 @@ const CharityDetails = () => {
           <div className="bg-white shadow-md rounded-lg px-10 lg:col-span-2 xl:col-span-2">
             <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} projectId={id} goalAmount={(charity.goalAmount)} />
           </div>
-          {charity.milestones.map((milestone) => (
-            <div key={milestone.id} className="bg-white shadow-md rounded-lg p-6 lg:col-span-2 xl:col-span-2">
-              <MilestoneBox
-                id={milestone.id}
-                amount={milestone.amount}
-                description={milestone.description}
-                workDone={milestone.workDone}
-                proofImages={milestone.proofImages}
-                votesFor={milestone.votesFor}
-                votesAgainst={milestone.votesAgainst}
-                posts={milestone.posts}
-                projectId={charity._id}
-              />
-            </div>
-          ))}
           <div className="bg-white shadow-md rounded-lg p-4">
             <ChartOne />
           </div>
@@ -165,7 +147,6 @@ const CharityDetails = () => {
             <TopDonors donors={charity.topDonors} />
           </div>
         </div>
-
         <Comments comments={charity.comments} />
       </div>
     </DefaultLayout>

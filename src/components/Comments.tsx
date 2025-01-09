@@ -20,7 +20,7 @@ const Comments: React.FC = () => {
     if (newComment.trim()) {
       const comment: Comment = {
         id: comments.length + 1,
-        user: 'Current User', // In a real app, this would be the logged-in user
+        user: 'Current User', // Update this to the actual user
         text: newComment.trim(),
         date: new Date().toISOString().split('T')[0],
       };

@@ -1,4 +1,4 @@
-"use client";
+"use client"
 import React, { useState, useEffect } from "react";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import DefaultLayout from "@/components/Layouts/DefaultLayout";
@@ -22,17 +22,16 @@ const charityCategories = [
 const Discover = () => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [charities, setCharities] = useState([]);
-  const [donations, setDonations] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
   const [carouselIndex, setCarouselIndex] = useState(0);
 
   useEffect(() => {
-    const fetchCharitiesWithImages = async () => {
+    const fetchCharities = async () => {
       setLoading(true);
       setError(null);
       try {
-        const response = await fetch(`/api/getProjects?category=${selectedCategory}&limit=10`);
+        const response = await fetch(`/api/getProjects?category=${selectedCategory}`);
         if (!response.ok) {
           throw new Error("Failed to fetch charities");
         }
@@ -46,23 +45,15 @@ const Discover = () => {
           })
         );
         setCharities(updatedCharities);
-
-        // Fetch user's donations (this is a mock, replace with actual API call)
-        const mockDonations = [
-          { id: 1, name: "Save the Oceans", amount: 50 },
-          { id: 2, name: "Education for All", amount: 100 },
-          { id: 3, name: "Local Food Bank", amount: 75 },
-        ];
-        setDonations(mockDonations);
       } catch (err) {
-        console.error("Error fetching data:", err);
+        console.error("Error fetching charities:", err);
         setError("Failed to load charities. Please try again later.");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchCharitiesWithImages();
+    fetchCharities();
   }, [selectedCategory]);
 
   const handleCategoryChange = (category) => {
@@ -77,6 +68,8 @@ const Discover = () => {
   const prevSlide = () => {
     setCarouselIndex((prevIndex) => (prevIndex - 1 + charities.length) % charities.length);
   };
+
+  const donationCharities = charities.filter(charity => [1, 2, 3].includes(charity.id));
 
   return (
     <DefaultLayout>
@@ -137,11 +130,19 @@ const Discover = () => {
             {/* Your Donations */}
             <h2 className="text-2xl font-bold mb-4">Your Donations</h2>
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {donations.map((donation) => (
-                <div key={donation.id} className="bg-white p-4 rounded-lg shadow">
-                  <h3 className="font-semibold">{donation.name}</h3>
-                  <p className="text-green-600 font-bold">${donation.amount} donated</p>
-                </div>
+              {donationCharities.map((charity) => (
+                <CharityCard
+                  key={charity.id}
+                  id={charity.id}
+                  name={charity.name}
+                  description={charity.description}
+                  imageUrl={charity.imageUrl || "/images/default-charity-image.jpg"}
+                  raisedAmount={charity.raisedAmount}
+                  goalAmount={charity.goalAmount}
+                  daysLeft={charity.daysLeft}
+                  donorCount={charity.donorCount}
+                  isDonation={true}
+                />
               ))}
             </div>
           </>

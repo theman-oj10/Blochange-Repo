@@ -10,6 +10,8 @@ import TopDonors from '@/components/TopDonors';
 import ChartOne from "@/components/Charts/ChartOne";
 import Comments from '@/components/Comments';
 import Donate from "@/components/Project/Donate"
+import Posts from '@/components/Posts';
+import ProfileImage from '@/components/ProfileImage';
 
 // Mock data for top donors
 const topDonors = [
@@ -103,6 +105,9 @@ const CharityDetails: React.FC = () => {
           <div className="shadow-md rounded-lg p-6 lg:col-span-2 xl:col-span-2">
             <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} />
           </div>
+          <div className="bg-white shadow-md rounded-lg p-6 lg:col-span-2 xl:col-span-2">
+            <Posts />
+          </div>
           <div className="shadow-md rounded-lg p-2">
             <ChartOne />
           </div>
@@ -110,7 +115,6 @@ const CharityDetails: React.FC = () => {
             <TopDonors />
           </div>
         </div>
-
         <Comments />
       </div>
     </DefaultLayout>
