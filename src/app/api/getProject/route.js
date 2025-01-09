@@ -26,20 +26,25 @@ export async function GET(request) {
     }
 
     const contract = new ethers.Contract(contractAddress, contractABI, provider);
-
+    
     let projectId = parseInt(id);
     const milestones = [];
     const projectOnChain = await contract.getProject(projectId);
-
     const [projectI, beneficiary, totalDonations, totalDonors, currentMilestone, completed] = projectOnChain;
 
     const currentMilestoneId = projectOnChain.currentMilestone;
 
-    for (let i = 1; i <= 1; i++) {
-      const milestoneData = await contract.getMilestone(projectI, i);
+    for (let i = 1; i <= currentMilestoneId; i++) {
+      let milestoneData
+      try {
+        milestoneData = await contract.getMilestone(projectI, i);
+      } catch (error) {
+        console.error(`Error fetching milestone ${i}:`, error);
+        break; // no more milestones after this, break;
+      }
 
       milestones.push({
-        id: Number(milestoneData.id) + 1,
+        id: Number(milestoneData.id),
         description: milestoneData.description,
         amount: ethers.formatEther(milestoneData.amount),
         fundsRaised: ethers.formatEther(projectOnChain.totalDonations),
@@ -51,6 +56,7 @@ export async function GET(request) {
 
     const responseData = {
       ...project,
+      goalAmount: ethers.formatEther(project.goalAmount),
       raisedAmount: ethers.formatEther(projectOnChain.totalDonations),
       onChainData: {
         totalDonations: ethers.formatEther(projectOnChain.totalDonations),

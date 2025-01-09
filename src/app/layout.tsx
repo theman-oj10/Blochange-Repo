@@ -23,6 +23,7 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <div id="modal-root"></div>
       <body suppressHydrationWarning={true}>
       <Web3Provider>
         {loading ? <Loader /> : children}

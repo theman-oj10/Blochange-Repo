@@ -118,11 +118,11 @@ const CharityDetails = () => {
             <p className="text-gray-600 mb-4">{charity.description}</p>
             <div className="bg-gray-100 p-4 rounded-lg mb-4">
               <div className="flex justify-between items-center mb-2">
-                <span className="text-green-600 font-semibold">${charity.raisedAmount} raised</span>
-                <span className="text-gray-500">of ${charity.goalAmount/1000000000000000}</span>
+                <span className="text-green-600 font-semibold">{charity.raisedAmount} MATIC raised</span>
+                <span className="text-gray-500">of {charity.goalAmount} MATIC</span>
               </div>
               <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                <div className="bg-green-600 h-2.5 rounded-full" style={{width: `${(charity.raisedAmount / (charity.goalAmount/ 1000000000000000)) * 100}%`}}></div>
+                <div className="bg-green-600 h-2.5 rounded-full" style={{width: `${(charity.raisedAmount / (charity.goalAmount)) * 100}%`}}></div>
               </div>
               <div className="flex justify-between text-sm text-gray-500">
                 <span>{charity.onChainData.totalDonors} donors</span>
@@ -137,7 +137,7 @@ const CharityDetails = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8">
           <div className="bg-white shadow-md rounded-lg px-10 lg:col-span-2 xl:col-span-2">
-            <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} projectId={id} />
+            <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} projectId={id} goalAmount={(charity.goalAmount)} />
           </div>
           <div className="bg-white shadow-md rounded-lg p-4">
             <ChartOne />
