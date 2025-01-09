@@ -1,27 +1,43 @@
-// /components/CreateMilestone.js
 "use client"
 
 import { useState, useContext } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { Web3Context } from '@/contexts/Web3Context';
 import { ethers } from 'ethers';
+import CurrencyInput from '@/components/CurrencyInput';
 
 const CreateMilestone = () => {
+  const router = useRouter();
   const { contract, account } = useContext(Web3Context);
   const [projectId, setProjectId] = useState('');
   const [description, setDescription] = useState('');
-  const [amount, setAmount] = useState('');
+  const [amountUSD, setAmountUSD] = useState('');
+  const [amountCrypto, setAmountCrypto] = useState('');
+  const [selectedCrypto, setSelectedCrypto] = useState('matic');
   const [txStatus, setTxStatus] = useState('');
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleAmountChange = (usdAmount, cryptoAmount) => {
+    setAmountUSD(usdAmount);
+    setAmountCrypto(cryptoAmount);
+  };
+
+  const handleCryptoChange = (crypto) => {
+    setSelectedCrypto(crypto);
+  };
 
   const handleCreateMilestone = async () => {
-    if (!projectId || !description || !amount) {
+    if (!projectId || !description || !amountCrypto) {
       alert('Please fill in all fields.');
       return;
     }
 
     try {
       setTxStatus('Initiating transaction...');
+      setIsSuccess(false);
 
-      const amountInWei = ethers.parseEther(amount);
+      const amountInWei = ethers.parseEther(amountCrypto);
 
       console.log(contract);
       const tx = await contract.createMilestone(
@@ -33,43 +49,50 @@ const CreateMilestone = () => {
       setTxStatus('Transaction sent. Waiting for confirmation...');
       await tx.wait();
       setTxStatus('Milestone created successfully!');
+      setIsSuccess(true);
     } catch (error) {
       console.error(error);
       setTxStatus('Transaction failed.');
+      setIsSuccess(false);
     }
   };
 
   return (
-    <div>
-      <h2>Create a New Milestone</h2>
+    <div className="space-y-4">
+      <h2 className="text-2xl font-bold">Create a New Milestone</h2>
       <input
         type="number"
         placeholder="Project ID"
         value={projectId}
         onChange={(e) => setProjectId(e.target.value)}
-        style={{ width: '300px', padding: '8px', marginBottom: '10px' }}
+        className="w-full rounded-md border border-gray-300 py-2 px-3 focus:border-blue-500 focus:outline-none"
       />
-      <br />
       <input
         type="text"
         placeholder="Milestone Description"
         value={description}
         onChange={(e) => setDescription(e.target.value)}
-        style={{ width: '300px', padding: '8px', marginBottom: '10px' }}
+        className="w-full rounded-md border border-gray-300 py-2 px-3 focus:border-blue-500 focus:outline-none"
       />
-      <br />
-      <input
-        type="number"
-        placeholder="Milestone Amount (in Ether)"
-        value={amount}
-        onChange={(e) => setAmount(e.target.value)}
-        style={{ width: '300px', padding: '8px', marginBottom: '10px' }}
+      <CurrencyInput
+        onAmountChange={handleAmountChange}
+        onCryptoChange={handleCryptoChange}
       />
-      <br />
-      <button onClick={handleCreateMilestone} style={{ padding: '8px 16px' }}>
+      <button 
+        onClick={handleCreateMilestone}
+        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-opacity-50"
+      >
         Create Milestone
       </button>
-      <p>{txStatus}</p>
+      <p className="text-sm text-gray-600">{txStatus}</p>
+      {isSuccess && (
+        <Link
+          href={`/charity/${projectId}`}
+          className="block w-full text-center bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 focus:outline-none focus:ring-2 focus:ring-green-500 focus:ring-opacity-50"
+        >
+          View Charity Page
+        </Link>
+      )}
     </div>
   );
 };
