@@ -1,79 +1,78 @@
 "use client";
 
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext } from 'react';
 import { Web3Context } from '@/contexts/Web3Context';
 import { ethers } from 'ethers';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
-import Image from 'next/image';
+import CurrencyInput from '@/components/CurrencyInput';
 
-const Donate = ({ projectId, projectName, organizationName, organizationAddress, taxId }) => {
-  const { contract, provider, account } = useContext(Web3Context);
-  const [amountUSD, setAmountUSD] = useState('');
-  const [amountCrypto, setAmountCrypto] = useState('');
+class Transaction {
+  constructor(data) {
+    this.projectId = data.projectId;
+    this.projectName = data.projectName;
+    this.amountUSD = data.amountUSD;
+    this.amountCrypto = data.amountCrypto;
+    this.cryptoType = "MATIC";
+    this.donorName = "Alice";
+    this.donorAddress = "123 Main St, Wonderland";
+    this.donorWallet = data.donorWallet;
+    this.transactionHash = data.transactionHash;
+    this.blockNumber = data.blockNumber;
+    this.gasPrice = data.gasPrice;
+    this.gasUsed = data.gasUsed;
+    this.date = new Date();
+    
+    // Additional fields that might be useful for the receipt
+    this.organizationName = "Blochange Shell Company";
+    this.organizationAddress = "Singapore";
+    this.taxId = "123456";
+    this.organizationWalletId = "0x1234567890";
+    
+    // Fields for detailed breakdown
+    this.totalDonationsUSD = data.totalDonationsUSD || this.amountUSD;
+    this.totalDonationsCrypto = data.totalDonationsCrypto || this.amountCrypto;
+    this.gasFeeCrypto = this.gasPrice * this.gasUsed;
+    this.gasFeeUSD = this.gasFeeCrypto * 0.01; // update this to live price
+    this.platformFeeUSD = data.platformFeeUSD || "0.50";
+    this.platformFeeCrypto = data.platformFeeCrypto || "0.001";
+    this.netDonationUSD = (parseFloat(this.totalDonationsUSD) - parseFloat(this.gasFeeUSD) - parseFloat(this.platformFeeUSD)).toFixed(2);
+    this.netDonationCrypto = (parseFloat(this.totalDonationsCrypto) - parseFloat(this.gasFeeCrypto) - parseFloat(this.platformFeeCrypto)).toFixed(6);
+  }
+
+  getReceiptNumber() {
+    return this.transactionHash ? this.transactionHash.slice(0, 8) : 'N/A';
+  }
+
+  getFormattedDate() {
+    return this.date.toLocaleDateString();
+  }
+}
+
+const Donate = ({ projectId, projectName }) => {
+  const { contract, account } = useContext(Web3Context);
+  const [transaction, setTransaction] = useState(null);
   const [txStatus, setTxStatus] = useState('');
-  const [conversionRate, setConversionRate] = useState(null);
-  const [selectedCrypto, setSelectedCrypto] = useState("ethereum");
   const [donationSuccessful, setDonationSuccessful] = useState(false);
-  const [transactionHash, setTransactionHash] = useState('x83838');
-  const [blockNumber, setBlockNumber] = useState('x828282');
-  const [gasUsed, setGasUsed] = useState('9090');
-  const [donorName, setDonorName] = useState('Manoj');
-  const [donorAddress, setDonorAddress] = useState('NUS');
-  organizationName = "Blochange Shell Company"
-  organizationAddress = "Singapore"
-
-  useEffect(() => {
-    const fetchConversionRate = async () => {
-      try {
-        const response = await fetch(`https://api.coingecko.com/api/v3/simple/price?ids=${selectedCrypto}&vs_currencies=usd`);
-        const data = await response.json();
-        setConversionRate(data[selectedCrypto].usd);
-      } catch (error) {
-        console.error("Error fetching conversion rate:", error);
-      }
-    };
-
-    fetchConversionRate();
-    const interval = setInterval(fetchConversionRate, 60000);
-
-    return () => clearInterval(interval);
-  }, [selectedCrypto]);
-
-  const handleUSDChange = (value) => {
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    const parts = numericValue.split('.');
-    if (parts.length > 2) {
-      parts.pop();
-    }
-    const sanitizedValue = parts.join('.');
-
-    setAmountUSD(sanitizedValue);
-    if (conversionRate && sanitizedValue !== "") {
-      setAmountCrypto((parseFloat(sanitizedValue) / conversionRate).toFixed(6));
-    } else {
-      setAmountCrypto("");
-    }
+  const donorName = 'Alice';
+  const donorAddress = '123 Main St, Wonderland';
+  const handleAmountChange = (usdAmount, cryptoAmount) => {
+    setTransaction(prevTransaction => ({
+      ...prevTransaction,
+      amountUSD: usdAmount,
+      amountCrypto: cryptoAmount
+    }));
   };
 
-  const handleCryptoChange = (value) => {
-    const numericValue = value.replace(/[^0-9.]/g, '');
-    const parts = numericValue.split('.');
-    if (parts.length > 2) {
-      parts.pop();
-    }
-    const sanitizedValue = parts.join('.');
-
-    setAmountCrypto(sanitizedValue);
-    if (conversionRate && sanitizedValue !== "") {
-      setAmountUSD((parseFloat(sanitizedValue) * conversionRate).toFixed(2));
-    } else {
-      setAmountUSD("");
-    }
+  const handleCryptoChange = (crypto) => {
+    setTransaction(prevTransaction => ({
+      ...prevTransaction,
+      cryptoType: crypto
+    }));
   };
 
   const handleDonate = async () => {
-    if (!projectId || !amountCrypto || !donorName || !donorAddress) {
+    if (!projectId || !transaction?.amountCrypto) {
       alert('Please enter all required information.');
       return;
     }
@@ -86,13 +85,24 @@ const Donate = ({ projectId, projectName, organizationName, organizationAddress,
     try {
       setTxStatus('Initiating donation...');
       const tx = await contract.donate(projectId, {
-        value: ethers.parseEther(amountCrypto),
+        value: ethers.parseEther(transaction.amountCrypto),
       });
       setTxStatus('Donation sent. Waiting for confirmation...');
       const receipt = await tx.wait();
-      setTransactionHash(receipt.transactionHash);
-      setBlockNumber(receipt.blockNumber.toString());
-      setGasUsed(receipt.gasUsed.toString());
+      console.log('Donation receipt:', receipt);
+      
+      const updatedTransaction = new Transaction({
+        ...transaction,
+        projectId,
+        projectName,
+        donorWallet: account,
+        transactionHash: receipt.hash,
+        blockNumber: receipt.blockNumber.toString(),
+        gasPrice: receipt.gasPrice.toString(),
+        gasUsed: receipt.gasUsed.toString(),
+      });
+      
+      setTransaction(updatedTransaction);
       setTxStatus('Donation successful!');
       setDonationSuccessful(true);
     } catch (error) {
@@ -101,66 +111,63 @@ const Donate = ({ projectId, projectName, organizationName, organizationAddress,
     }
   };
 
-  const generateReceipt = async () => {
+  const generateReceipt = () => {
     const doc = new jsPDF();
     
     // Add logo
-    const logoUrl = '/images/logo/bloc-logo.png';
-    doc.addImage(logoUrl, 'PNG', 10, 10, 30, 30);
+    const logoUrl = '/images/logo/bloc-logo-light.png';
+    doc.addImage(logoUrl, 'PNG', 10, 10, 90, 30);
     
     // Add title
     doc.setFontSize(28);
     doc.setTextColor(62, 84, 129);
-    doc.text('RECEIPT', 200, 20, null, null, 'right');
+    doc.text('INVOICE', 200, 35, null, null, 'right');
     
     // Add organization name and receipt details
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
-    doc.text(organizationName, 10, 50);
-    doc.text(`Receipt Number: ${transactionHash.slice(0, 8)}`, 200, 50, null, null, 'right');
-    doc.text(`Date: ${new Date().toLocaleDateString()}`, 200, 57, null, null, 'right');
+    doc.text(transaction.organizationName, 10, 50);
+    doc.text(`Receipt Number: ${transaction.getReceiptNumber()}`, 200, 50, null, null, 'right');
+    doc.text(`Date: ${transaction.getFormattedDate()}`, 200, 57, null, null, 'right');
     
     // Add donor and organization info
     doc.setFontSize(10);
     doc.text('Bill from:', 10, 70);
-    doc.text(organizationName, 10, 77);
-    doc.text(organizationAddress, 10, 84);
-    doc.text(`Tax ID: ${taxId}`, 10, 91);
+    doc.text(transaction.organizationName, 10, 77);
+    doc.text(transaction.organizationAddress, 10, 84);
+    doc.text(`Tax ID: ${transaction.taxId}`, 10, 91);
+    doc.text(`Org Wallet: ${transaction.organizationWalletId}`, 10, 98);
     
     doc.text('Bill to:', 110, 70);
-    doc.text(donorName, 110, 77);
-    doc.text(donorAddress, 110, 84);
-    doc.text(`Wallet: ${account.slice(0, 20)}...`, 110, 91);
+    doc.text(transaction.donorName, 110, 77);
+    doc.text(transaction.donorAddress, 110, 84);
+    doc.text(`Wallet: ${transaction.donorWallet ? transaction.donorWallet.slice(0, 20) + '...' : 'N/A'}`, 110, 91);
     
-    // Add table
+    // Add table with transaction information
     doc.autoTable({
-      startY: 100,
-      head: [['Item', 'Quantity', 'Rate', 'Tax', 'Amount']],
+      startY: 105,
+      head: [['Item', 'Amount (USD)', `Amount (${transaction.cryptoType.toUpperCase()})`]],
       body: [
-        [projectName, '01', `$${amountUSD}`, '0.00', `$${amountUSD}`],
-      ],
-      foot: [
-        ['', '', '', 'Subtotal:', `$${amountUSD}`],
-        ['', '', '', 'Discount:', '$0.00'],
-        ['', '', '', 'Tax:', '$0.00'],
-        ['', '', '', 'Paid:', '$0.00'],
-        ['', '', '', 'Total:', `$${amountUSD}`],
+        [transaction.projectName, `$${transaction.amountUSD}`, `${transaction.amountCrypto} ${transaction.cryptoType.toUpperCase()}`],
+        ['Total Donations', `$${transaction.totalDonationsUSD}`, `${transaction.totalDonationsCrypto} ${transaction.cryptoType.toUpperCase()}`],
+        ['Gas Fees', `$${transaction.gasFeeUSD}`, `${transaction.gasFeeCrypto} ${transaction.cryptoType.toUpperCase()}`],
+        ['Platform Fees', `$${transaction.platformFeeUSD}`, `${transaction.platformFeeCrypto} ${transaction.cryptoType.toUpperCase()}`],
+        ['Net Donations', `$${transaction.netDonationUSD}`, `${transaction.netDonationCrypto} ${transaction.cryptoType.toUpperCase()}`],
       ],
       styles: { fontSize: 9 },
       headStyles: { fillColor: [62, 84, 129] },
-      footStyles: { fillColor: [240, 240, 240], textColor: [0, 0, 0], fontStyle: 'bold' },
     });
     
-    // Add Polygon transaction details
+    // Add transaction details
     const finalY = doc.lastAutoTable.finalY || 150;
     doc.setFontSize(8);
-    doc.text(`Transaction Hash: ${transactionHash}`, 10, finalY + 10);
-    doc.text(`Block Number: ${blockNumber}`, 10, finalY + 15);
-    doc.text(`Gas Used: ${gasUsed}`, 10, finalY + 20);
+    doc.text(`Transaction Hash: ${transaction.transactionHash}`, 10, finalY + 10);
+    doc.text(`Block Number: ${transaction.blockNumber}`, 10, finalY + 15);
+    doc.text(`Gas Used: ${transaction.gasUsed}`, 10, finalY + 20);
     
-    const explorerLink = `https://mumbai.polygonscan.com/tx/${transactionHash}`;
+    const explorerLink = `https://amoy.polygonscan.com/tx/${transaction.transactionHash}`;
     doc.setTextColor(0, 0, 255);
-    doc.textWithLink('View on Mumbai Polygonscan', 10, finalY + 25, { url: explorerLink });
+    doc.textWithLink('View on Polygonscan', 10, finalY + 25, { url: explorerLink });
     
     // Add terms and conditions
     doc.setTextColor(0, 0, 0);
@@ -168,43 +175,16 @@ const Donate = ({ projectId, projectName, organizationName, organizationAddress,
     doc.text('This is a testnet transaction and has no real monetary value.', 10, finalY + 35);
     doc.text('In a real-world scenario, consult with a tax professional regarding the deductibility of your donation.', 10, finalY + 40);
     
-    doc.save('styled_testnet_donation_receipt.pdf');
+    doc.save('Blochange_Donation_Receipt.pdf');
   };
 
   return (
     <div className="space-y-4">
       <h2 className="text-xl font-semibold">Donate to this project</h2>
-      <div className="grid grid-cols-2 gap-4">
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Amount in USD"
-            value={amountUSD}
-            onChange={(e) => handleUSDChange(e.target.value)}
-            className="w-full rounded-md border border-gray-300 py-2 pl-3 pr-10 focus:border-blue-500 focus:outline-none"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-            USD
-          </span>
-        </div>
-        <div className="relative">
-          <input
-            type="text"
-            placeholder="Amount in MATIC"
-            value={amountCrypto}
-            onChange={(e) => handleCryptoChange(e.target.value)}
-            className="w-full rounded-md border border-gray-300 py-2 pl-3 pr-20 focus:border-blue-500 focus:outline-none"
-          />
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500">
-            MATIC
-          </span>
-        </div>
-      </div>
-      {conversionRate && (
-        <p className="text-sm text-gray-500">
-          1 USD = {(1 / conversionRate).toFixed(6)} MATIC
-        </p>
-      )}
+      <CurrencyInput
+        onAmountChange={handleAmountChange}
+        onCryptoChange={handleCryptoChange}
+      />
       <button 
         onClick={handleDonate} 
         className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
