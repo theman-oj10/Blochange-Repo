@@ -32,7 +32,7 @@ const CreateProject = () => {
         beneficiary,
         // projectName,
         // description,
-        // ethers.parseEther(goalAmount)
+        ethers.parseEther(goalAmount)
       );
       setTxStatus("Transaction sent. Waiting for confirmation...");
       const receipt = await tx.wait();

@@ -42,14 +42,7 @@ const CharityDetails = () => {
           throw new Error('Failed to fetch project details');
         }
         const data = await response.json();
-        data.project.milestones = {
-          milestones: data.project.milestones.map(x => ({ id: x, amount: x, description: "Test" })),
-          currentAmount: 0.5
-        };
-        // const imageUrl = await getRandomImage(`${data.project.category} charity`);
-        
         data.project.imageUrl = 'imageUrl';
-        console.log(data.project.milestones);
         setCharity(data.project);
       } catch (err) {
         console.error(err);
@@ -60,7 +53,7 @@ const CharityDetails = () => {
     };
 
     fetchCharityDetails();
-  }, []);
+  }, []); // need to fix this
 
   if (loading) {
     return (
@@ -103,7 +96,7 @@ const CharityDetails = () => {
             <Image 
               // src={charity.beneficiaryProfilePic} 
               src='/team-01.png'
-              alt={charity.beneficiaryName} 
+              alt={charity.beneficiary} 
               width={40} 
               height={40} 
               className="rounded-full"
@@ -132,7 +125,7 @@ const CharityDetails = () => {
                 <div className="bg-green-600 h-2.5 rounded-full" style={{width: `${(charity.raisedAmount / (charity.goalAmount/ 1000000000000000)) * 100}%`}}></div>
               </div>
               <div className="flex justify-between text-sm text-gray-500">
-                <span>{charity.donorCount} donors</span>
+                <span>{charity.onChainData.totalDonors} donors</span>
                 <span>{charity.daysLeft} days left</span>
               </div>
             </div>
@@ -144,7 +137,7 @@ const CharityDetails = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8">
           <div className="bg-white shadow-md rounded-lg px-10 lg:col-span-2 xl:col-span-2">
-            <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} />
+            <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} projectId={id} />
           </div>
           <div className="bg-white shadow-md rounded-lg p-4">
             <ChartOne />
