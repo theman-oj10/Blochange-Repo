@@ -9,7 +9,7 @@ import CreateProject from '@/components/Project/CreateProject'
 
 export const metadata: Metadata = {
   title:
-    "BlocChange",
+    "Blochange",
   description: "Change the World one block at a time",
 };
 
