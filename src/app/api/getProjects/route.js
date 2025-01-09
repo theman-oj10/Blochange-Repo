@@ -32,8 +32,8 @@ export async function GET(request) {
       description: project.description,
       raisedAmount: project.raisedAmount,
       goalAmount: project.goalAmount,
-      beneficiaryName: project.beneficiaryName || 'John Smith'
-      benefiaryPorfilePic: 'team-01.png'
+      beneficiaryName: project.beneficiaryName || 'John Smith',
+      beneficaryProfilePic: 'team-01.png',
       daysLeft: project.daysLeft,
       donorCount: project.donorCount,
       category: project.category,

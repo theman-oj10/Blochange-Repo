@@ -144,7 +144,7 @@ const CharityDetails = () => {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8">
           <div className="bg-white shadow-md rounded-lg p-6 lg:col-span-2 xl:col-span-2">
-            <Milestones milestones={charity.milestones } currentAmount={charity.raisedAmount} />
+            <Milestones milestones={charity.milestones} currentAmount={charity.raisedAmount} />
           </div>
           <div className="bg-white shadow-md rounded-lg p-6">
             <ChartOne />
