@@ -1,6 +1,8 @@
 import React, { useState, useContext, useEffect } from 'react';
 import { Web3Context } from '@/contexts/Web3Context';
 import Posts from '@/components/Posts';
+import MilestoneVoting from '@/components/MilestoneVoting';
+
 
 interface Milestone {
   id: number;
@@ -154,90 +156,86 @@ const Milestones: React.FC<MilestonesProps> = ({
 
       {/* Milestone Details Section */}
       {selectedMilestone && (
-        <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
-          <div className="p-6 space-y-8">
-            {/* Header & Description */}
-            <div className="space-y-4">
-              <div className="flex justify-between items-start">
-                <div>
-                  <h3 className="text-xl font-semibold text-gray-800">
-                    Milestone {selectedMilestone.id}
-                  </h3>
-                  <p className="text-gray-600 mt-1">
-                    ${selectedMilestone.amount.toLocaleString()}
-                  </p>
-                </div>
-                <div className="text-right">
-                  <div className="text-sm text-gray-600">
-                    <p>Votes For: {selectedMilestone.votesFor}</p>
-                    <p>Donors not yet voted: {selectedMilestone.votesAgainst}</p>
-                  </div>
-                  <button
-                    onClick={() => castVote(selectedMilestone.id, true)}
-                    disabled={!isMilestoneReached(selectedMilestone.amount) || isVoting}
-                    className={`mt-2 px-4 py-2 rounded-lg transition-colors
-                      ${isVoting ? 'bg-gray-400 cursor-wait' :
-                        isMilestoneReached(selectedMilestone.amount)
-                          ? 'bg-green-500 hover:bg-green-600 text-white'
-                          : 'bg-gray-100 text-gray-400 cursor-not-allowed'}`}
-                  >
-                    {isVoting ? 'Voting...' : 'Cast Approval Vote'}
-                  </button>
-                  {votingStatus && (
-                    <p className="text-sm italic text-gray-500 mt-2">{votingStatus}</p>
-                  )}
-                </div>
-              </div>
+  <div className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+    <div className="p-6 space-y-8">
+      {/* Header */}
+      <div className="flex justify-between items-start">
+        <h3 className="text-xl font-semibold text-gray-800">
+          Milestone {selectedMilestone.id}
+          <p className="text-gray-600 mt-1">
+            ${selectedMilestone.amount.toLocaleString()}
+          </p>
+        </h3>
+      </div>
 
+      {/* Content Grid: Description on left, Voting on right */}
+      <div className="grid grid-cols-2 gap-8">
+        {/* Left Column - Description */}
+        <div className="space-y-6">
+          <div>
+            <h4 className="font-semibold text-gray-700 mb-2">Description</h4>
+            <p className="text-gray-600">{selectedMilestone.description}</p>
+          </div>
+
+          {/* Work Done Section */}
+          <div className="space-y-6">
+            <h4 className="font-semibold text-gray-700">Work Done</h4>
+            <textarea
+              className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg resize-none bg-gray-50"
+              value={selectedMilestone.workDone || 'No work reported yet'}
+              readOnly
+            />
+
+            {selectedMilestone.proofImages && selectedMilestone.proofImages.length > 0 && (
               <div>
-                <h4 className="font-semibold text-gray-700 mb-2">Description</h4>
-                <p className="text-gray-600">{selectedMilestone.description}</p>
-              </div>
-            </div>
-
-            <hr className="border-gray-200" />
-
-            {/* Work Done & Proof Section */}
-            <div className="space-y-6">
-              <h4 className="font-semibold text-gray-700">Work Done</h4>
-              <textarea
-                className="w-full min-h-[100px] p-3 border border-gray-300 rounded-lg resize-none bg-gray-50"
-                value={selectedMilestone.workDone || 'No work reported yet'}
-                readOnly
-              />
-
-              {selectedMilestone.proofImages && selectedMilestone.proofImages.length > 0 && (
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-3">Proof Images</h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                    {selectedMilestone.proofImages.map((image, index) => (
-                      <div key={index} className="relative aspect-video">
-                        <img
-                          src={image}
-                          alt={`Proof ${index + 1}`}
-                          className="w-full h-full object-cover rounded-lg shadow-sm"
-                        />
-                      </div>
-                    ))}
-                  </div>
+                <h4 className="font-semibold text-gray-700 mb-3">Proof Images</h4>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {selectedMilestone.proofImages.map((image, index) => (
+                    <div key={index} className="relative aspect-video">
+                      <img
+                        src={image}
+                        alt={`Proof ${index + 1}`}
+                        className="w-full h-full object-cover rounded-lg shadow-sm"
+                      />
+                    </div>
+                  ))}
                 </div>
-              )}
-            </div>
-
-            <hr className="border-gray-200" />
-
-            {/* Discussion Section */}
-            <div>
-              <Posts 
-                key={selectedMilestone.id} 
-                milestoneId={selectedMilestone.id} 
-                userId={account} 
-                initialPosts={selectedMilestone.posts}
-              />
-            </div>
+              </div>
+            )}
           </div>
         </div>
-      )}
+
+        {/* Right Column - Voting */}
+        <div>
+          <MilestoneVoting
+            votesFor={selectedMilestone.votesFor}
+            votesAgainst={selectedMilestone.votesAgainst}
+            totalDonors={selectedMilestone.totalDonors || 0}
+            isVoting={isVoting}
+            isMilestoneReached={isMilestoneReached(selectedMilestone.amount)}
+            onVoteFor={() => castVote(selectedMilestone.id, true)}
+            onVoteAgainst={() => castVote(selectedMilestone.id, false)}
+            onRequestRevision={() => {
+              console.log('Request revision for milestone:', selectedMilestone.id);
+            }}
+          />
+        </div>
+      </div>
+
+      <hr className="border-gray-200" />
+
+      {/* Discussion Section */}
+      <div>
+        <Posts 
+          key={selectedMilestone.id} 
+          milestoneId={selectedMilestone.id} 
+          userId={account} 
+          initialPosts={selectedMilestone.posts}
+        />
+      </div>
+    </div>
+  </div>
+)}
     </div>
   );
 };

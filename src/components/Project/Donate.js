@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import { jsPDF } from 'jspdf';
 import 'jspdf-autotable';
 import CurrencyInput from '@/components/CurrencyInput';
+import PaymentDialog from '@/components/PaymentDialog';
 
 class Transaction {
   constructor(data) {
@@ -23,17 +24,15 @@ class Transaction {
     this.gasUsed = data.gasUsed;
     this.date = new Date();
     
-    // Additional fields that might be useful for the receipt
     this.organizationName = "Blochange Shell Company";
     this.organizationAddress = "Singapore";
     this.taxId = "123456";
     this.organizationWalletId = "0x1234567890";
     
-    // Fields for detailed breakdown
     this.totalDonationsUSD = data.totalDonationsUSD || this.amountUSD;
     this.totalDonationsCrypto = data.totalDonationsCrypto || this.amountCrypto;
     this.gasFeeCrypto = this.gasPrice * this.gasUsed;
-    this.gasFeeUSD = this.gasFeeCrypto * 0.01; // update this to live price
+    this.gasFeeUSD = this.gasFeeCrypto * 0.01;
     this.platformFeeUSD = data.platformFeeUSD || "0.50";
     this.platformFeeCrypto = data.platformFeeCrypto || "0.001";
     this.netDonationUSD = (parseFloat(this.totalDonationsUSD) - parseFloat(this.gasFeeUSD) - parseFloat(this.platformFeeUSD)).toFixed(2);
@@ -54,8 +53,8 @@ const Donate = ({ projectId, projectName }) => {
   const [transaction, setTransaction] = useState(null);
   const [txStatus, setTxStatus] = useState('');
   const [donationSuccessful, setDonationSuccessful] = useState(false);
-  const donorName = 'Alice';
-  const donorAddress = '123 Main St, Wonderland';
+  const [dialogOpen, setDialogOpen] = useState(false);
+  
   const handleAmountChange = (usdAmount, cryptoAmount) => {
     setTransaction(prevTransaction => ({
       ...prevTransaction,
@@ -114,23 +113,19 @@ const Donate = ({ projectId, projectName }) => {
   const generateReceipt = () => {
     const doc = new jsPDF();
     
-    // Add logo
     const logoUrl = '/images/logo/bloc-logo-light.png';
     doc.addImage(logoUrl, 'PNG', 10, 10, 90, 30);
     
-    // Add title
     doc.setFontSize(28);
     doc.setTextColor(62, 84, 129);
     doc.text('INVOICE', 200, 35, null, null, 'right');
     
-    // Add organization name and receipt details
     doc.setFontSize(12);
     doc.setTextColor(0, 0, 0);
     doc.text(transaction.organizationName, 10, 50);
     doc.text(`Receipt Number: ${transaction.getReceiptNumber()}`, 200, 50, null, null, 'right');
     doc.text(`Date: ${transaction.getFormattedDate()}`, 200, 57, null, null, 'right');
     
-    // Add donor and organization info
     doc.setFontSize(10);
     doc.text('Bill from:', 10, 70);
     doc.text(transaction.organizationName, 10, 77);
@@ -143,7 +138,6 @@ const Donate = ({ projectId, projectName }) => {
     doc.text(transaction.donorAddress, 110, 84);
     doc.text(`Wallet: ${transaction.donorWallet ? transaction.donorWallet.slice(0, 20) + '...' : 'N/A'}`, 110, 91);
     
-    // Add table with transaction information
     doc.autoTable({
       startY: 105,
       head: [['Item', 'Amount (USD)', `Amount (${transaction.cryptoType.toUpperCase()})`]],
@@ -158,7 +152,6 @@ const Donate = ({ projectId, projectName }) => {
       headStyles: { fillColor: [62, 84, 129] },
     });
     
-    // Add transaction details
     const finalY = doc.lastAutoTable.finalY || 150;
     doc.setFontSize(8);
     doc.text(`Transaction Hash: ${transaction.transactionHash}`, 10, finalY + 10);
@@ -169,7 +162,6 @@ const Donate = ({ projectId, projectName }) => {
     doc.setTextColor(0, 0, 255);
     doc.textWithLink('View on Polygonscan', 10, finalY + 25, { url: explorerLink });
     
-    // Add terms and conditions
     doc.setTextColor(0, 0, 0);
     doc.setFontSize(8);
     doc.text('This is a testnet transaction and has no real monetary value.', 10, finalY + 35);
@@ -186,20 +178,22 @@ const Donate = ({ projectId, projectName }) => {
         onCryptoChange={handleCryptoChange}
       />
       <button 
-        onClick={handleDonate} 
-        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300"
+        onClick={() => setDialogOpen(true)}
+        disabled={!transaction?.amountCrypto}
+        className="w-full bg-blue-500 text-white py-2 px-4 rounded-md hover:bg-blue-600 transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        Donate
+        Continue to Payment
       </button>
-      {txStatus && <p className="text-sm text-gray-600">{txStatus}</p>}
-      {donationSuccessful && (
-        <button 
-          onClick={generateReceipt}
-          className="w-full mt-4 bg-green-500 text-white py-2 px-4 rounded-md hover:bg-green-600 transition duration-300"
-        >
-          Download Tax-Deductible Receipt
-        </button>
-      )}
+      
+      <PaymentDialog
+        isOpen={dialogOpen}
+        onClose={() => setDialogOpen(false)}
+        transaction={transaction}
+        onDonate={handleDonate}
+        txStatus={txStatus}
+        donationSuccessful={donationSuccessful}
+        onGenerateReceipt={generateReceipt}
+      />
     </div>
   );
 };
