@@ -11,9 +11,8 @@ interface Milestone {
   proofImages: string[];
   votesFor: number;
   votesAgainst: number;
-  castVote: (milestoneId: number, vote: boolean) => void;
-  releaseFunds: (milestoneId: number) => void;
   posts: any;
+  projectId: number;
 }
 
 const MilestoneBox: React.FC<Milestone> = ({
@@ -24,7 +23,8 @@ const MilestoneBox: React.FC<Milestone> = ({
   proofImages,
   votesFor,
   votesAgainst,
-  posts
+  posts,
+  projectId
 }) => {
 
     const { contract, account } = useContext(Web3Context);

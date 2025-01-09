@@ -154,6 +154,7 @@ const CharityDetails = () => {
                 votesFor={milestone.votesFor}
                 votesAgainst={milestone.votesAgainst}
                 posts={milestone.posts}
+                projectId={charity._id}
               />
             </div>
           ))}

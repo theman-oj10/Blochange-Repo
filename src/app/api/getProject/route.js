@@ -33,7 +33,8 @@ export async function GET(request) {
 
     const currentMilestoneId = projectOnChain.currentMilestone;
 
-    for (let i = 1; i <= currentMilestoneId; i++) {
+    let i = 1;
+    do {
       let milestoneData;
       try {
         milestoneData = await contract.getMilestone(projectI, i);
@@ -63,7 +64,9 @@ export async function GET(request) {
           author: post.userId,
         })),
       });
-    }
+      
+      i += 1;
+    } while (true)
 
     const responseData = {
       ...project,
