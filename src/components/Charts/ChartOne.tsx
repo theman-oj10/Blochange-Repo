@@ -1,21 +1,9 @@
 import { ApexOptions } from "apexcharts";
-import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic";
+import React from "react";
+import ReactApexChart from "react-apexcharts";
 import DefaultSelectOption from "@/components/SelectOption/DefaultSelectOption";
 
-// Dynamically import ReactApexChart to prevent SSR issues
-const ReactApexChart = dynamic(() => import("react-apexcharts"), { ssr: false });
-
 const ChartOne: React.FC = () => {
-  const [isClient, setIsClient] = useState(false);
-
-  useEffect(() => {
-    // Check if we're running on the client (browser)
-    if (typeof window !== "undefined") {
-      setIsClient(true);
-    }
-  }, []);
-
   const series = [
     {
       name: "Received Amount",
@@ -69,6 +57,7 @@ const ChartOne: React.FC = () => {
     stroke: {
       curve: "smooth",
     },
+
     markers: {
       size: 0,
     },
@@ -97,7 +86,7 @@ const ChartOne: React.FC = () => {
       },
       y: {
         title: {
-          formatter: function () {
+          formatter: function (e) {
             return "";
           },
         },
@@ -153,18 +142,17 @@ const ChartOne: React.FC = () => {
           <DefaultSelectOption options={["Monthly", "Yearly"]} />
         </div>
       </div>
-      {isClient && (
-        <div>
-          <div className="-ml-4 -mr-5">
-            <ReactApexChart
-              options={options}
-              series={series}
-              type="area"
-              height={310}
-            />
-          </div>
+      <div>
+        <div className="-ml-4 -mr-5">
+          <ReactApexChart
+            options={options}
+            series={series}
+            type="area"
+            height={310}
+          />
         </div>
-      )}
+      </div>
+
       <div className="flex flex-col gap-2 text-center xsm:flex-row xsm:gap-0">
         <div className="border-stroke dark:border-dark-3 xsm:w-1/2 xsm:border-r">
           <p className="font-medium">Received Amount</p>
