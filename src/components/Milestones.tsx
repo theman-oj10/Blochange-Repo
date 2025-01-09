@@ -14,8 +14,7 @@ interface MilestonesProps {
 const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount }) => {
   const [activeTooltip, setActiveTooltip] = useState<number | null>(null);
   const [hoverTooltip, setHoverTooltip] = useState({ show: false, position: 0 });
-
-  const totalAmount = milestones[milestones.length - 1].amount;
+  const totalAmount = milestones.milestones[milestones.milestones.length - 1].amount;
   const progress = Math.min((currentAmount / totalAmount) * 100, 100);
 
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -47,7 +46,7 @@ const Milestones: React.FC<MilestonesProps> = ({ milestones, currentAmount }) =>
             </div>
           )}
         </div>
-        {milestones.map((milestone, index) => {
+        {milestones.milestones.map((milestone, index) => {
           const position = (milestone.amount / totalAmount) * 100;
           return (
             <div 

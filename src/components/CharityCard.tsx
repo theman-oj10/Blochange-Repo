@@ -23,6 +23,7 @@ const CharityCard: React.FC<CharityCardProps> = ({
   daysLeft,
   donorCount
 }) => {
+  goalAmount = goalAmount / 1000000000000000; // FIX!
   return (
     <Link href={`/charity/${id}`} className="block h-full">
       <div className="bg-white rounded-lg shadow-md overflow-hidden transition-transform hover:scale-105 h-full flex flex-col">

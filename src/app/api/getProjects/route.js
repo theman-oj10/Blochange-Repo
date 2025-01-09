@@ -28,10 +28,12 @@ export async function GET(request) {
     // Transform the data as needed
     const projectsData = projectArray.map(project => ({
       id: project._id.toString(),
-      name: project.name,
+      name: project.projectName,
       description: project.description,
       raisedAmount: project.raisedAmount,
       goalAmount: project.goalAmount,
+      beneficiaryName: project.beneficiaryName || 'John Smith'
+      benefiaryPorfilePic: 'team-01.png'
       daysLeft: project.daysLeft,
       donorCount: project.donorCount,
       category: project.category,

@@ -48,7 +48,6 @@ const Discover = () => {
           const errorData = await response.json();
           throw new Error(errorData.message || "Failed to fetch charities");
         }
-
         const data = await response.json();
         const { projects, total, pages } = data;
 
@@ -63,7 +62,6 @@ const Discover = () => {
             }
           })
         );
-
         setCharities(updatedCharities);
         setTotalPages(pages);
       } catch (err) {
