@@ -41,7 +41,7 @@ const DropdownUser = () => {
 
         <span className="flex items-center gap-2 font-medium text-dark dark:text-dark-6">
           {account ? (
-            <span className="hidden lg:block">{truncateAddress(account)}</span>
+            <span className="hidden lg:block">Manoj Narender</span> // this can be updated in the future to show account name
           ) : (
             <span className="hidden lg:block">Connect Wallet</span>
           )}

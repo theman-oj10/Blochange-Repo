@@ -1,5 +1,5 @@
-import React from 'react';
-import { ThumbsUp, ThumbsDown, AlertCircle } from 'lucide-react';
+import React, { useState, useEffect } from 'react';
+import { ThumbsUp, ThumbsDown, AlertCircle, X, CheckCircle2 } from 'lucide-react';
 
 const MilestoneVoting = ({ 
   votesFor, 
@@ -11,6 +11,30 @@ const MilestoneVoting = ({
   onVoteAgainst,
   onRequestRevision 
 }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [revisionRequest, setRevisionRequest] = useState('');
+  const [showSuccess, setShowSuccess] = useState(false);
+
+  useEffect(() => {
+    let timeout;
+    if (showSuccess) {
+      timeout = setTimeout(() => {
+        setShowSuccess(false);
+        setIsModalOpen(false);
+      }, 2000);
+    }
+    return () => clearTimeout(timeout);
+  }, [showSuccess]);
+
+  const handleRevisionSubmit = () => {
+    if (revisionRequest.trim()) {
+      console.log('Revision request:', revisionRequest);
+      setShowSuccess(true);
+      setRevisionRequest('');
+      onRequestRevision();
+    }
+  };
+  
   return (
     <div className="bg-white p-6 rounded-lg border border-gray-200 space-y-6">
       {/* Total Donors Display */}
@@ -62,7 +86,7 @@ const MilestoneVoting = ({
 
       {/* Revision Request Button */}
       <button
-        onClick={onRequestRevision}
+        onClick={() => setIsModalOpen(true)}
         disabled={!isMilestoneReached || isVoting}
         className={`w-full mt-4 flex items-center justify-center gap-2 py-3 px-4 rounded-lg border
           ${isVoting ? 'bg-gray-100 cursor-wait' :
@@ -85,6 +109,65 @@ const MilestoneVoting = ({
       {!isMilestoneReached && (
         <div className="text-center text-sm text-gray-500 mt-4">
           Voting will be enabled once the milestone amount is reached
+        </div>
+      )}
+
+      {/* Revision Request Modal */}
+      {isModalOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          {/* Backdrop */}
+          <div 
+            className="fixed inset-0 bg-black bg-opacity-25 backdrop-blur-sm"
+            onClick={() => setIsModalOpen(false)}
+          />
+          
+          {/* Modal Content */}
+          <div className="relative z-50 w-full max-w-md bg-white p-6 rounded-lg shadow-xl border border-gray-200">
+            {/* Header */}
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold text-gray-900">
+                Request Milestone Revision
+              </h3>
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="text-gray-400 hover:text-gray-500 transition-colors"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Success Alert */}
+            {showSuccess && (
+              <div className="mb-4 p-3 bg-green-50 border border-green-200 rounded-lg flex items-center gap-2 text-green-700">
+                <CheckCircle2 className="w-5 h-5" />
+                <span>Request submitted successfully</span>
+              </div>
+            )}
+            
+            {/* Textarea */}
+            <textarea
+              value={revisionRequest}
+              onChange={(e) => setRevisionRequest(e.target.value)}
+              placeholder="Please describe your revision request..."
+              className="w-full min-h-[120px] p-3 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-yellow-500 focus:border-yellow-500 text-gray-700 placeholder-gray-400"
+            />
+            
+            {/* Footer */}
+            <div className="mt-6 flex justify-end gap-3">
+              <button
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 text-sm font-medium text-gray-700 bg-gray-50 border border-gray-200 rounded-lg hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleRevisionSubmit}
+                className="px-4 py-2 text-sm font-medium text-yellow-700 bg-yellow-50 border border-yellow-500 rounded-lg hover:bg-yellow-100 transition-colors"
+              >
+                Submit Request
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>
