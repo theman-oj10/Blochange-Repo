@@ -9,6 +9,7 @@ import Milestones from '@/components/Milestones';
 import TopDonors from '@/components/TopDonors';
 import ChartOne from "@/components/Charts/ChartOne";
 import Comments from '@/components/Comments';
+import Donate from "@/components/Project/Donate"
 
 // Mock data for top donors
 const topDonors = [
@@ -94,9 +95,9 @@ const CharityDetails: React.FC = () => {
                 <span>{charity.daysLeft} days left</span>
               </div>
             </div>
-            <button className="bg-blue-500 text-white px-6 py-2 rounded-full hover:bg-blue-600 transition-colors">
-              Donate Now
-            </button>
+            <section style={{ marginTop: '40px' }}>
+              <Donate />
+            </section>
           </div>
         </div>
         <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8">

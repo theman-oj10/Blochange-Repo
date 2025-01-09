@@ -5,6 +5,7 @@ import "@/css/satoshi.css";
 import "@/css/style.css";
 import React, { useEffect, useState } from "react";
 import Loader from "@/components/common/Loader";
+import { Web3Provider } from "../contexts/Web3Context"
 
 export default function RootLayout({
   children,
@@ -23,7 +24,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
+      <Web3Provider>
         {loading ? <Loader /> : children}
+      </Web3Provider>
       </body>
     </html>
   );
