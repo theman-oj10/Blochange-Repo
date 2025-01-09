@@ -10,6 +10,7 @@ import ChartOne from "@/components/Charts/ChartOne";
 import Comments from '@/components/Comments';
 import Donate from "@/components/Project/Donate";
 import CharityStats from '@/components/CharityStats';
+import SocialShare from '@/components/SocialShare';
 
 const CharityDetails = () => {
   const { id } = useParams();
@@ -189,8 +190,12 @@ const CharityDetails = () => {
                   />
                 </div>
               </div>
-              
+              <SocialShare 
+                projectName={charity.projectName}
+                projectDescription={charity.description}
+              />
               <Donate projectId={charity._id} />
+              
             </div>
           </div>
         </div>

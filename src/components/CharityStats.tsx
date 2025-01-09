@@ -30,7 +30,6 @@ const CharityStats: React.FC<CharityStatsProps> = ({
           <div>
             <div className="flex items-baseline gap-1">
               <p className="text-lg font-bold text-gray-900">{impactCount}</p>
-              <p className="text-xs text-gray-500">people</p>
             </div>
             <p className="text-xs text-gray-500">Lives Impacted</p>
           </div>
