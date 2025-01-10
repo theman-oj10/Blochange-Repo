@@ -113,18 +113,25 @@ To get a local copy up and running follow these steps.
 
 ## Current UI
 
-Our core functionality lies within the Donation details page and the discover page. Here are some screenshots of the UI <br>
+Our core functionality lies within the Donation details page and the discover page. Here are some screenshots of the UI <br><br>
 <b>Discover/Home Page:</b> <br>
 <img src="public/images/readme/discover.png" alt="Discover Page" width="500"/> <br>
-<b>Donation Details Page:</b><br>
+<br> <b>Donation Details Page:</b><br>
 <img src="public/images/readme/donationpage.png" alt="Donation Details" width="500"/> <br>
-<b>Automatically Generated Receipt:<</b><br>
+<br> <b>Immutable Records of Transactions:</b><br>
+<img src="public/images/readme/transactions.gif" alt="Record of Transactions" width="500"/> <br>
+<br> <b>Evidence of Impact:</b><br>
+<img src="public/images/readme/impact.gif" alt="Record of Transactions" width="500"/> <br>
+<br><b>Voting system:</b><br>
+<img src="public/images/readme/voting.gif" alt="Voting UI" width="500"/><br>
+<br><b>We can use polygonscan to see the live transactions and function calls being made on the blockchain:</b><br>
+<img src="public/images/readme/polygonscan.gif" alt="Blockchain Integration" width="500"/><br>
+<br><b>Automatically Generated Receipt:</b><br>
 <img src="public/images/readme/receipt.png" alt="Receipt" width="500"/><br>
-<b>Current voting system:</b><br>
-<img src="public/images/readme/voting.png" alt="Voting UI" width="500"/><br>
-<b>We can use polygonscan to see the live transactions and function calls being made on the blockchain:</b><br>
-<img src="public/images/readme/polygonscan.png" alt="Blockchain Integration" width="500"/><br>
-
+<br><b>Discussion Forum:</b><br>
+<img src="public/images/readme/discussionforum.png" alt="Receipt" width="500"/><br>
+<br><b>Other Statistics:</b><br>
+<img src="public/images/readme/other_stats.png" alt="Other Stats" width="500"/><br>
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
 <!-- ROADMAP -->
