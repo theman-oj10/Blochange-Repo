@@ -375,51 +375,40 @@ const Milestones: React.FC<MilestonesProps> = ({
             </div>
 
             {/* Work Done and Transactions Section */}
-            <div className="space-y-6">
-              <div className="grid grid-cols-2 gap-6">
-                {/* Left Column - Transactions */}
-                <TransactionList
-                  transactions={transactions}
-                  selectedTransaction={selectedTransaction}
-                  onTransactionSelect={setSelectedTransaction}
-                  formatAmount={formatAmount}
-                />
+{/* Work Done and Transactions Section */}
+<div className="space-y-6">
+  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+    {/* Left Column - Transactions */}
+    <div>
+      <h2 className="text-xl font-semibold text-gray-700 mb-4">Transactions</h2>
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <TransactionList
+          transactions={transactions}
+          selectedTransaction={selectedTransaction}
+          onTransactionSelect={setSelectedTransaction}
+          formatAmount={formatAmount}
+        />
+      </div>
+    </div>
 
-                {/* Right Column - Work Done Details */}
-                <div>
-                  <h4 className="font-semibold text-gray-700 mb-4">Work Done Details</h4>
-                  <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-                    <WorkDoneDetails 
-                      transaction={transactions.find(t => t.id === selectedTransaction)}
-                      formatAmount={formatAmount}
-                    />
-                  </div>
-                </div>
-              </div>
-
-          {/* Proof Images Section */}
-          {selectedMilestone.proofImages && selectedMilestone.proofImages.length > 0 && (
-            <div>
-              <h4 className="font-semibold text-gray-700 mb-3">Proof Images</h4>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {selectedMilestone.proofImages.map((image, index) => (
-                  <div key={index} className="relative aspect-video">
-                    <img
-                      src={image}
-                      alt={`Proof ${index + 1}`}
-                      className="w-full h-full object-cover rounded-lg shadow-sm"
-                    />
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
+    {/* Right Column - Work Done Details */}
+    <div>
+      <h2 className="text-xl font-semibold text-gray-700 mb-4">Work Done</h2>
+      <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <WorkDoneDetails 
+          transaction={transactions.find(t => t.id === selectedTransaction)}
+          formatAmount={formatAmount}
+        />
+      </div>
+    </div>
+  </div>
+</div>
 
           <hr className="border-gray-200" />
 
           {/* Discussion Section */}
           <div>
+            <h2 className="text-xl font-semibold text-gray-700 mb-4">Discussion Forum</h2>
             <Posts 
               key={selectedMilestone.id} 
               milestoneId={selectedMilestone.id} 

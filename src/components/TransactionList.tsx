@@ -81,12 +81,6 @@ const TransactionList: React.FC<TransactionListProps> = ({
 
   return (
     <div>
-      <h4 className="font-semibold text-gray-700 mb-4 text-lg">
-        <span className="flex items-center gap-2">
-          <FileText className="w-5 h-5" />
-          Milestone Transactions
-        </span>
-      </h4>
       <div className="border border-gray-200 rounded-lg overflow-hidden divide-y divide-gray-200">
         {transactions.map((transaction) => {
           const typeDetails = getTransactionTypeDetails(transaction.type);
