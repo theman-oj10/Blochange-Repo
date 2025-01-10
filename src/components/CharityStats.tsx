@@ -1,105 +1,128 @@
 // CharityStats.tsx
 import React from 'react';
-import { Users, Clock, Star, Calendar, MapPin, Heart } from 'lucide-react';
+import { Users, Clock, Star, Calendar, MapPin, Heart, Target, Shield } from 'lucide-react';
 
 interface CharityStatsProps {
   totalDonors: number;
   daysLeft: number;
   rating: number;
-  launchDate: string;
-  location: string;
+  totalRatings: number;
+  city: string;
+  country: string;
   impactCount: number;
+  launchDate: string;
+  milestoneCount?: number;
+  credibilityScore?: number;
 }
 
 const CharityStats: React.FC<CharityStatsProps> = ({
   totalDonors,
   daysLeft,
   rating,
+  totalRatings,
+  city,
+  country,
+  impactCount,
   launchDate,
-  location,
-  impactCount
+  milestoneCount = 5,
+  credibilityScore = 95
 }) => {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-      {/* Impact */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-pink-50 rounded-lg">
-            <Heart className="h-4 w-4 text-pink-500" />
-          </div>
+    <div className="grid grid-cols-2 gap-4">
+      {/* Rating Card */}
+      <div className="bg-yellow-50/50 p-4 rounded-xl">
+        <div className="flex gap-2 items-start">
+          <Star className="w-5 h-5 text-yellow-600 mt-1" />
           <div>
-            <div className="flex items-baseline gap-1">
-              <p className="text-lg font-bold text-gray-900">{impactCount}</p>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{rating}</div>
+            <div className="text-sm text-gray-600">Project Rating</div>
+            <div className="flex mt-2">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-4 h-4 ${
+                    i < Math.floor(rating) ? 'text-yellow-500 fill-yellow-500' : 'text-gray-300'
+                  }`}
+                />
+              ))}
             </div>
-            <p className="text-xs text-gray-500">Lives Impacted</p>
           </div>
         </div>
       </div>
 
-      {/* Donors */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-blue-50 rounded-lg">
-            <Users className="h-4 w-4 text-blue-500" />
-          </div>
+      {/* Location Card */}
+      <div className="bg-emerald-50/50 p-4 rounded-xl">
+        <div className="flex gap-2 items-start">
+          <MapPin className="w-5 h-5 text-emerald-600 mt-1" />
           <div>
-            <p className="text-lg font-bold text-gray-900">{totalDonors}</p>
-            <p className="text-xs text-gray-500">Total Donors</p>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{city}</div>
+            <div className="text-sm text-gray-600">{country}</div>
           </div>
         </div>
       </div>
 
-      {/* Days Left */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-green-50 rounded-lg">
-            <Clock className="h-4 w-4 text-green-500" />
-          </div>
+      {/* Lives Impacted Card */}
+      <div className="bg-rose-50/50 p-4 rounded-xl">
+        <div className="flex gap-2 items-start">
+          <Heart className="w-5 h-5 text-rose-600 mt-1" />
           <div>
-            <p className="text-lg font-bold text-gray-900">{daysLeft}</p>
-            <p className="text-xs text-gray-500">Days Left</p>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{impactCount}</div>
+            <div className="text-sm text-gray-600">Lives Impacted</div>
           </div>
         </div>
       </div>
 
-      {/* Rating */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-yellow-50 rounded-lg">
-            <Star className="h-4 w-4 text-yellow-500" />
-          </div>
+      {/* Total Donors Card */}
+      <div className="bg-blue-50/50 p-4 rounded-xl">
+        <div className="flex gap-2 items-start">
+          <Users className="w-5 h-5 text-blue-600 mt-1" />
           <div>
-            <div className="flex items-center gap-1">
-              <p className="text-lg font-bold text-gray-900">{rating}</p>
-              <span className="text-xs text-gray-500">/5</span>
-            </div>
-            <p className="text-xs text-gray-500">Project Rating</p>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{totalDonors}</div>
+            <div className="text-sm text-gray-600">Total Donors</div>
           </div>
         </div>
       </div>
 
-      {/* Launch Date */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-purple-50 rounded-lg">
-            <Calendar className="h-4 w-4 text-purple-500" />
-          </div>
+      {/* Launch Date Card */}
+      <div className="bg-indigo-50/50 p-4 rounded-xl">
+        <div className="flex gap-2 items-start">
+          <Calendar className="w-5 h-5 text-indigo-600 mt-1" />
           <div>
-            <p className="text-lg font-bold text-gray-900">{launchDate}</p>
-            <p className="text-xs text-gray-500">Launch Date</p>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{launchDate}</div>
+            <div className="text-sm text-gray-600">Launch Date</div>
           </div>
         </div>
       </div>
 
-      {/* Location */}
-      <div className="bg-white rounded-lg shadow-sm border border-gray-100 p-3">
-        <div className="flex items-center gap-2">
-          <div className="p-1.5 bg-red-50 rounded-lg">
-            <MapPin className="h-4 w-4 text-red-500" />
-          </div>
+      {/* Days Left Card */}
+      <div className="bg-purple-50/50 p-4 rounded-xl">
+        <div className="flex gap-2 items-start">
+          <Clock className="w-5 h-5 text-purple-600 mt-1" />
           <div>
-            <p className="text-lg font-bold text-gray-900">Lagos</p>
-            <p className="text-xs text-gray-500">Location</p>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{daysLeft}</div>
+            <div className="text-sm text-gray-600">Days Left</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Credibility Score Card */}
+      <div className="bg-cyan-50/50 p-4 rounded-xl">
+        <div className="flex gap-2 items-start">
+          <Shield className="w-5 h-5 text-cyan-600 mt-1" />
+          <div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{credibilityScore}</div>
+            <div className="text-sm text-gray-600">Credibility Score</div>
+          </div>
+        </div>
+      </div>
+
+      {/* Milestones Card */}
+      <div className="bg-teal-50/50 p-4 rounded-xl">
+        <div className="flex gap-2 items-start">
+          <Target className="w-5 h-5 text-teal-600 mt-1" />
+          <div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">{milestoneCount}</div>
+            <div className="text-sm text-gray-600">Milestones</div>
           </div>
         </div>
       </div>

@@ -2,8 +2,9 @@
 
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Image from 'next/image';
+import { Heart, Users, Calendar, Star, MapPin, Share2, Twitter, Facebook, Linkedin, Instagram, Link } from 'lucide-react';
+import DefaultLayout from "@/components/Layouts/DefaultLayout";
 import Milestones from '@/components/Milestones';
 import TopDonors from '@/components/TopDonors';
 import ChartOne from "@/components/Charts/ChartOne";
@@ -76,29 +77,6 @@ const CharityDetails = () => {
       maximumFractionDigits: 2
     })} MATIC`;
   };
-  const tagStyles = {
-  'Humanitarian Assistance': 'from-orange-100 to-orange-50 text-orange-600 border-orange-200',
-  'Hunger Relief': 'from-green-100 to-green-50 text-green-600 border-green-200',
-  'Emergency Aid': 'from-red-100 to-red-50 text-red-600 border-red-200',
-  'Community Support': 'from-blue-100 to-blue-50 text-blue-600 border-blue-200'
-};
-
-  const CurrencyToggle = () => (
-    <button
-      onClick={() => setShowUSD(!showUSD)}
-      className="inline-flex items-center px-3 py-1 border border-gray-300 rounded-full text-sm font-medium bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
-    >
-      <span className={`mr-2 ${showUSD ? 'text-gray-900' : 'text-gray-400'}`}>USD</span>
-      <div className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors duration-200 ease-in-out ${showUSD ? 'bg-blue-600' : 'bg-gray-200'}`}>
-        <span
-          className={`inline-block h-4 w-4 transform rounded-full bg-white transition duration-200 ease-in-out ${
-            showUSD ? 'translate-x-6' : 'translate-x-1'
-          }`}
-        />
-      </div>
-      <span className={`ml-2 ${!showUSD ? 'text-gray-900' : 'text-gray-400'}`}>MATIC</span>
-    </button>
-  );
 
   if (loading) {
     return (
@@ -129,119 +107,154 @@ const CharityDetails = () => {
       </DefaultLayout>
     );
   }
-  
+
   return (
-    <DefaultLayout>
-      <div className="container mx-auto py-8 px-4 space-y-8">
-        {/* Header */}
-<div className="flex justify-between items-center">
-  <h1 className="text-3xl font-bold text-gray-700">{charity.projectName}</h1>
-  <div className="flex items-center space-x-4">
-    <CurrencyToggle />
-    <div className="flex items-center">
-      <span className="mr-2">{"Aid Africa"}</span>
-      <Image 
-        src="/images/team-01.png"
-        alt={charity.beneficiary} 
-        width={40} 
-        height={40} 
-        className="rounded-full"
-      />
-    </div>
+  <DefaultLayout>
+    <div className="max-w-7xl mx-auto px-4 py-8">
+      {/* Hero Section */}
+      <div className="relative mb-12">
+        <div className="relative h-96 w-full rounded-2xl overflow-hidden">
+          <Image 
+            src="/africa.jpg"
+            alt="Children in classroom"
+            fill
+            className="object-cover"
+            priority
+          />
+          <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+        </div>
+        
+        <div className="absolute bottom-8 left-8 right-8 text-white">
+          <div className="flex flex-col lg:flex-row lg:justify-between lg:items-end gap-4">
+            <div>
+              <h1 className="text-2xl lg:text-4xl font-bold mb-4">{charity.projectName}</h1>
+              <div className="flex flex-wrap gap-3 mb-4">
+                <span className="px-4 py-2 rounded-full bg-orange-500/20 backdrop-blur-sm text-white border border-orange-300/30">
+                  Humanitarian Assistance
+                </span>
+                <span className="px-4 py-2 rounded-full bg-green-500/20 backdrop-blur-sm text-white border border-green-300/30">
+                  Hunger Relief
+                </span>
+              </div>
+            </div>
+            <div className="flex items-center gap-4">
+              <button className="p-2 rounded-full bg-white/10 hover:bg-white/20 backdrop-blur-sm transition-colors">
+                <Share2 className="w-5 h-5 text-white" />
+              </button>
+              <div className="flex items-center gap-2 bg-white/10 p-2 rounded-full backdrop-blur-sm">
+                <div className="relative w-8 h-8">
+                  <Image 
+                    src="/images/team-01.png"
+                    alt="Aid Africa"
+                    fill
+                    className="rounded-full border-2 border-white object-cover"
+                  />
+                </div>
+                <span className="px-2">Aid Africa</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content Grid */}
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+        {/* Left Column - Stats Cards and Social Share */}
+<div className="space-y-6">
+  {/* Stats Component */}
+  <CharityStats
+    totalDonors={charity.onChainData.totalDonors}
+    daysLeft={100}
+    rating={4.5}
+    totalRatings={127}
+    city="Lagos"
+    country="Nigeria"
+    impactCount={charity.onChainData.totalDonors}
+    launchDate="Jan 2024"
+  />
+
+  {/* Social Share Component */}
+  <div className="bg-white p-6 rounded-xl shadow-sm">
+    <SocialShare 
+      projectName={charity.projectName}
+      projectDescription="Help fund education for underprivileged kids in Lagos, Nigeria"
+    />
   </div>
 </div>
         
-        {/* Main Content */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-          {/* Left Column - Image and Stats */}
-          <div className="space-y-6">
-            <Image 
-              src='/africa.jpg'
-              alt={charity.projectName} 
-              width={600} 
-              height={400} 
-              className="rounded-lg shadow-md w-full"
-            />
-            
-            <CharityStats
-              totalDonors={charity.onChainData.totalDonors}
-              daysLeft={100}
-              rating={4.9}
-              launchDate="Jan 2024"
-              location="Lagos, Nigeria"
-              impactCount={100}
-            />
-          </div>
 
-          {/* Right Column - Description and Donate */}
-<div>
-  <p className="text-gray-600">{charity.description}</p>
-  
-  <div className="mt-6">
-    {/* Progress Bar */}
-    <div className="bg-gray-100 p-4 rounded-lg mb-4">
-      <div className="flex justify-between items-center mb-2">
-        <span className="text-green-600 font-semibold">
-          {formatAmount(charity.raisedAmount)} raised
-        </span>
-        <span className="text-gray-500">
-          of {formatAmount(charity.goalAmount)}
-        </span>
+        {/* Center Column - Main Content */}
+<div className="lg:col-span-2 space-y-8">
+  {/* Progress Section */}
+  <div className="bg-white p-6 rounded-xl shadow-sm">
+    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
+      <div>
+        <h3 className="text-2xl font-bold text-gray-900">{formatAmount(charity.raisedAmount)}</h3>
+        <p className="text-sm text-gray-500">raised of {formatAmount(charity.goalAmount)} goal</p>
       </div>
-      <div className="w-full bg-gray-200 rounded-full h-3">
-        <div 
-          className="bg-green-600 h-3 rounded-full transition-all duration-300" 
-          style={{
-            width: `${Math.min((charity.raisedAmount / charity.goalAmount) * 100, 100)}%`
-          }}
-        />
-      </div>
+      <button
+        onClick={() => setShowUSD(!showUSD)}
+        className="flex items-center gap-2 px-4 py-2 rounded-full border border-gray-200 hover:bg-gray-50 transition-colors"
+      >
+        <span className={showUSD ? 'text-blue-600 font-medium' : 'text-gray-500'}>USD</span>
+        <div className={`w-12 h-6 rounded-full p-1 transition-colors ${showUSD ? 'bg-blue-600' : 'bg-gray-200'}`}>
+          <div className={`w-4 h-4 rounded-full bg-white transform transition-transform duration-200 ${showUSD ? 'translate-x-6' : 'translate-x-0'}`} />
+        </div>
+        <span className={!showUSD ? 'text-blue-600 font-medium' : 'text-gray-500'}>MATIC</span>
+      </button>
     </div>
-    
-    {/* Tags and Social Share Container */}
-<div className="flex justify-between items-center mb-6">
-  <div className="flex gap-3">
-    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-orange-50 text-orange-600 border border-orange-100 whitespace-nowrap">
-      Humanitarian Assistance
-    </span>
-    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-green-50 text-green-600 border border-green-100 whitespace-nowrap">
-      Hunger Relief
-    </span>
-  </div>
-  <SocialShare 
-    projectName={charity.projectName}
-    projectDescription={charity.description}
-  />
-</div>
 
-    <Donate projectId={charity._id} />
+    <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden mb-8">
+      <div 
+        className="h-full bg-blue-600 transition-all duration-500"
+        style={{
+          width: `${Math.min((charity.raisedAmount / charity.goalAmount) * 100, 100)}%`
+        }}
+      />
+    </div>
+
+    <div className="mb-8 space-y-6">
+      <p className="text-gray-700 text-lg leading-relaxed">
+        In Lagos, Nigeria, thousands of children lack access to quality education due to financial barriers and limited resources. Many families struggle to afford basic educational supplies, and local schools often operate without adequate teaching materials or qualified instructors, leaving bright young minds without the opportunity to reach their full potential.
+      </p>
+      <p className="text-gray-700 text-lg leading-relaxed">
+        Our initiative provides comprehensive educational support by funding school supplies, learning materials, and qualified teachers for underprivileged children. By equipping these students with the tools they need and creating an engaging learning environment, we're working to break the cycle of poverty through education and empower the next generation of leaders in Lagos.
+      </p>
+    </div>
+
+    <div className="mt-8">
+      <Donate projectId={charity._id} />
+    </div>
   </div>
 </div>
-        </div>
+      </div>
 
-        {/* Milestones and Other Sections */}
-        <div className="grid grid-cols-1 lg:grid-cols-2 xl:grid-cols-2 gap-8 mt-8">
-          <div className="bg-white shadow-md rounded-lg px-10 lg:col-span-2 xl:col-span-2">
-            <Milestones 
-              milestones={charity.milestones} 
-              currentAmount={charity.raisedAmount}
-              projectId={id} 
-              goalAmount={charity.goalAmount}
-              conversionRate={conversionRate}
-              showUSD={showUSD}
-            />
-          </div>
-          <div className="bg-white shadow-md rounded-lg p-4">
-            <ChartOne />
-          </div>
-          <div className="bg-white shadow-md rounded-lg p-4">
-            <TopDonors donors={charity.topDonors} />
-          </div>
+      {/* Milestones and Other Sections */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
+        <div className="bg-white shadow-md rounded-xl p-10 lg:col-span-2">
+          <Milestones 
+            milestones={charity.milestones} 
+            currentAmount={charity.raisedAmount}
+            projectId={id} 
+            goalAmount={charity.goalAmount}
+            conversionRate={conversionRate}
+            showUSD={showUSD}
+          />
         </div>
+        <div className="bg-white shadow-md rounded-xl p-4">
+          <ChartOne />
+        </div>
+        <div className="bg-white shadow-md rounded-xl p-4">
+          <TopDonors donors={charity.topDonors} />
+        </div>
+      </div>
+      
+      <div className="mt-8">
         <Comments comments={charity.comments} />
       </div>
-    </DefaultLayout>
-  );
+    </div>
+  </DefaultLayout>
+);
 };
 
 export default CharityDetails;
