@@ -66,7 +66,7 @@ const CharityStats: React.FC<CharityStatsProps> = ({
         <div className="flex gap-2 items-start">
           <Heart className="w-5 h-5 text-rose-600 mt-1" />
           <div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">{impactCount}</div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">200</div>
             <div className="text-sm text-gray-600">Lives Impacted</div>
           </div>
         </div>
@@ -77,7 +77,7 @@ const CharityStats: React.FC<CharityStatsProps> = ({
         <div className="flex gap-2 items-start">
           <Users className="w-5 h-5 text-blue-600 mt-1" />
           <div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">{totalDonors}</div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">82</div>
             <div className="text-sm text-gray-600">Total Donors</div>
           </div>
         </div>
@@ -88,7 +88,7 @@ const CharityStats: React.FC<CharityStatsProps> = ({
         <div className="flex gap-2 items-start">
           <Calendar className="w-5 h-5 text-indigo-600 mt-1" />
           <div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">{launchDate}</div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">October 2024</div>
             <div className="text-sm text-gray-600">Launch Date</div>
           </div>
         </div>
@@ -121,7 +121,7 @@ const CharityStats: React.FC<CharityStatsProps> = ({
         <div className="flex gap-2 items-start">
           <Target className="w-5 h-5 text-teal-600 mt-1" />
           <div>
-            <div className="text-2xl font-bold text-gray-900 mb-1">{milestoneCount}</div>
+            <div className="text-2xl font-bold text-gray-900 mb-1">3</div>
             <div className="text-sm text-gray-600">Milestones</div>
           </div>
         </div>

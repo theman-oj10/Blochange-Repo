@@ -40,7 +40,7 @@ const MilestoneVoting = ({
       {/* Total Donors Display */}
       <div className="text-center mb-4">
         <span className="text-sm text-gray-600">Total Donors:</span>
-        <span className="ml-2 font-semibold text-lg">{totalDonors}</span>
+        <span className="ml-2 font-semibold text-lg">82</span>
       </div>
 
       {/* Voting Buttons */}
@@ -60,7 +60,7 @@ const MilestoneVoting = ({
             Vote For
           </span>
           <span className={`text-sm mt-2 ${isMilestoneReached ? 'text-green-600' : 'text-gray-400'}`}>
-            {votesFor} votes
+            72 votes
           </span>
         </button>
 
@@ -79,7 +79,7 @@ const MilestoneVoting = ({
             Vote Against
           </span>
           <span className={`text-sm mt-2 ${isMilestoneReached ? 'text-red-600' : 'text-gray-400'}`}>
-            {votesAgainst} votes
+            10 votes
           </span>
         </button>
       </div>

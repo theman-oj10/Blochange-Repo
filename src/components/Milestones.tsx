@@ -112,7 +112,7 @@ const Milestones: React.FC<MilestonesProps> = ({
       id: '2',
       amount: 2000,
       timestamp: Date.now() - 172800000,
-      workDone: "Developed core functionality including user authentication and database schema.",
+      workDone: "Finalised development contract and initial downpayment.",
       status: 'completed',
       type: 'withdrawal',
       txHash: '0xabcdef1234567890abcdef1234567890abcdef1234567890abcdef1234567890',
@@ -128,8 +128,8 @@ const Milestones: React.FC<MilestonesProps> = ({
       workImages: [
         {
           id: 'i3',
-          title: 'Authentication Flow',
-          url: '/images/auth-flow.jpg',
+          title: 'Contract Screenshot',
+          url: '/images/contract-screenshot.png',
           description: 'User authentication flow diagram and implementation'
         }
       ]
@@ -227,7 +227,8 @@ const Milestones: React.FC<MilestonesProps> = ({
       }
 
       setVotingStatus(`Submitting vote for milestone ${milestoneId}...`);
-      const tx = await contract.vote(projectId, milestoneId);
+      console.log(projectId, milestoneId);
+      const tx = await contract.vote(projectId, milestoneId.toString());
       await tx.wait();
       
       setVotingStatus(`Vote submitted successfully for milestone ${milestoneId}`);
@@ -352,7 +353,7 @@ const Milestones: React.FC<MilestonesProps> = ({
                   </div>
                   <div className="mt-4">
                     <h4 className="font-semibold text-gray-700 mb-2">Description</h4>
-                    <p className="text-gray-600">{selectedMilestone.description}</p>
+                    <p className="text-gray-600">In this milestone, we have negotiated and settled the development contracts for a school to be built in Ngao. We have also completed our initial research and planning, and have developed a timeline and resource allocation plans.</p>
                   </div>
                 </div>
               </div>

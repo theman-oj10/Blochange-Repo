@@ -142,7 +142,36 @@ const Posts = ({ milestoneId, userId, initialPosts }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [sortBy, setSortBy] = useState('hot');
   const fileInputRef = useRef(null);
-
+  const comments = [
+    {
+      content: "Great cause, and even better team behind it!",
+      date: "2024-10-31",
+    },
+    {
+      content: "Truly inspiring work! Can't wait to see the impact.",
+      date: "2024-11-01",
+    },
+    {
+      content: "A meaningful initiative that’s much needed. Kudos to the team!",
+      date: "2024-11-01",
+    },
+    {
+      content: "Love the focus on sustainable practices for long-term change.",
+      date: "2024-11-01",
+    },
+    {
+      content: "Making a difference, one school at a time. Proud to support this.",
+      date: "2024-11-01",
+    },
+    {
+      content: "An excellent project – supporting education in rural areas is so important!",
+      date: "2024-11-01",
+    },
+    {
+      content: "Such a thoughtful approach to building strong, self-sustaining communities.",
+      date: "2024-11-01",
+    },
+  ];
   const handlePostSubmit = async (e) => {
     e.preventDefault();
     if (newPost.trim() === '' && attachments.length === 0) return;
@@ -203,8 +232,8 @@ const Posts = ({ milestoneId, userId, initialPosts }) => {
         </div>
 
         <div className="space-y-4">
-          {posts.map((post) => (
-            <div key={post.id} className="bg-white rounded-lg p-6 shadow-sm">
+          {comments.map((post, index) => (
+            <div key={index} className="bg-white rounded-lg p-6 shadow-sm">
               <Comment comment={post} onReply={handleReply} />
             </div>
           ))}

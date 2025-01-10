@@ -20,7 +20,56 @@ const CharityDetails = () => {
   const [error, setError] = useState(null);
   const [conversionRate, setConversionRate] = useState(null);
   const [showUSD, setShowUSD] = useState(true);
-
+  const USE_HARDCODED_VALUES = true; // Set to false to use original behavior
+  const HARDCODED_GOAL = 10000;
+  const HARDCODED_RAISED = 5000;
+  
+  const milestones = [
+  {
+    id: 1,  // Add id property
+    title: "Initial Educational Supplies",
+    description: "Purchase basic school supplies including textbooks, notebooks, and stationery for 100 students",
+    amount: 2000,
+    completed: true,
+    votesFor: 0,   // Add required properties
+    votesAgainst: 0,
+    posts: [],
+    totalDonors: 100
+  },
+  {
+    id: 2,
+    title: "Teacher Training Program",
+    description: "Fund training workshops for 10 local teachers to improve teaching methodologies",
+    amount: 4000,
+    completed: false,
+    votesFor: 0,
+    votesAgainst: 0,
+    posts: [],
+    totalDonors: 100
+  },
+  {
+    id: 3,
+    title: "Classroom Technology",
+    description: "Install basic computer equipment and educational software in two classrooms",
+    amount: 7000,
+    completed: false,
+    votesFor: 0,
+    votesAgainst: 0,
+    posts: [],
+    totalDonors: 100
+  },
+  {
+    id: 4,
+    title: "Library Resources",
+    description: "Set up a small library with essential reading materials and reference books",
+    amount: 10000,
+    completed: false,
+    votesFor: 0,
+    votesAgainst: 0,
+    posts: [],
+    totalDonors: 100
+  }
+];
   useEffect(() => {
     const fetchConversionRate = async () => {
       try {
@@ -55,6 +104,9 @@ const CharityDetails = () => {
     const interval = setInterval(fetchConversionRate, 60000);
     return () => clearInterval(interval);
   }, [id]);
+  const getAmount = (originalAmount, hardcodedAmount) => {
+    return USE_HARDCODED_VALUES ? hardcodedAmount : originalAmount;
+  };
 
   const convertMaticToUSD = (maticAmount) => {
     if (!conversionRate || !maticAmount) return 0;
@@ -133,7 +185,7 @@ const CharityDetails = () => {
                   Humanitarian Assistance
                 </span>
                 <span className="px-4 py-2 rounded-full bg-green-500/20 backdrop-blur-sm text-white border border-green-300/30">
-                  Hunger Relief
+                  Education
                 </span>
               </div>
             </div>
@@ -189,8 +241,10 @@ const CharityDetails = () => {
   <div className="bg-white p-6 rounded-xl shadow-sm">
     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-8">
       <div>
-        <h3 className="text-2xl font-bold text-gray-900">{formatAmount(charity.raisedAmount)}</h3>
-        <p className="text-sm text-gray-500">raised of {formatAmount(charity.goalAmount)} goal</p>
+        {/* <h3 className="text-2xl font-bold text-gray-900">{formatAmount(charity.raisedAmount)}</h3> */}
+        <h3 className="text-2xl font-bold text-gray-900">{formatAmount(5000)}</h3>
+        {/* <p className="text-sm text-gray-500">raised of {formatAmount(charity.goalAmount)} goal</p> */}
+        <p className="text-sm text-gray-500">raised of {formatAmount(10000)} goal</p>
       </div>
       <button
         onClick={() => setShowUSD(!showUSD)}
@@ -207,18 +261,21 @@ const CharityDetails = () => {
     <div className="w-full h-4 bg-gray-100 rounded-full overflow-hidden mb-8">
       <div 
         className="h-full bg-blue-600 transition-all duration-500"
+        // style={{
+        //   width: `${Math.min((charity.raisedAmount / charity.goalAmount) * 100, 100)}%`
+        // }}
         style={{
-          width: `${Math.min((charity.raisedAmount / charity.goalAmount) * 100, 100)}%`
+          width: `${Math.min((HARDCODED_RAISED/ HARDCODED_GOAL) * 100, 100)}%`
         }}
       />
     </div>
 
     <div className="mb-8 space-y-6">
       <p className="text-gray-700 text-lg leading-relaxed">
-        In Lagos, Nigeria, thousands of children lack access to quality education due to financial barriers and limited resources. Many families struggle to afford basic educational supplies, and local schools often operate without adequate teaching materials or qualified instructors, leaving bright young minds without the opportunity to reach their full potential.
+        <b>Problem: </b>In Lagos, Nigeria, thousands of children lack access to quality education due to financial barriers and limited resources. Many families struggle to afford basic educational supplies, and local schools often operate without adequate teaching materials or qualified instructors, leaving bright young minds without the opportunity to reach their full potential.
       </p>
       <p className="text-gray-700 text-lg leading-relaxed">
-        Our initiative provides comprehensive educational support by funding school supplies, learning materials, and qualified teachers for underprivileged children. By equipping these students with the tools they need and creating an engaging learning environment, we're working to break the cycle of poverty through education and empower the next generation of leaders in Lagos.
+        <b>Solution: </b>Our initiative provides comprehensive educational support by funding school supplies, learning materials, and qualified teachers for underprivileged children. By equipping these students with the tools they need and creating an engaging learning environment, we're working to break the cycle of poverty through education and empower the next generation of leaders in Lagos.
       </p>
     </div>
 
@@ -233,10 +290,13 @@ const CharityDetails = () => {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mt-8">
         <div className="bg-white shadow-md rounded-xl p-10 lg:col-span-2">
           <Milestones 
-            milestones={charity.milestones} 
-            currentAmount={charity.raisedAmount}
+            // milestones={charity.milestones} 
+            milestones={milestones}
+            // currentAmount={charity.raisedAmount}
+            currentAmount={HARDCODED_RAISED}
             projectId={id} 
-            goalAmount={charity.goalAmount}
+            // goalAmount={charity.goalAmount}
+            goalAmount={HARDCODED_GOAL}
             conversionRate={conversionRate}
             showUSD={showUSD}
           />
