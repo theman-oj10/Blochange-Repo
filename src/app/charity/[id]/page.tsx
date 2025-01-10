@@ -76,6 +76,12 @@ const CharityDetails = () => {
       maximumFractionDigits: 2
     })} MATIC`;
   };
+  const tagStyles = {
+  'Humanitarian Assistance': 'from-orange-100 to-orange-50 text-orange-600 border-orange-200',
+  'Hunger Relief': 'from-green-100 to-green-50 text-green-600 border-green-200',
+  'Emergency Aid': 'from-red-100 to-red-50 text-red-600 border-red-200',
+  'Community Support': 'from-blue-100 to-blue-50 text-blue-600 border-blue-200'
+};
 
   const CurrencyToggle = () => (
     <button
@@ -128,22 +134,22 @@ const CharityDetails = () => {
     <DefaultLayout>
       <div className="container mx-auto py-8 px-4 space-y-8">
         {/* Header */}
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold text-gray-700">{charity.projectName}</h1>
-          <div className="flex items-center space-x-4">
-            <CurrencyToggle />
-            <div className="flex items-center">
-              <span className="mr-2">{"Aid Africa"}</span>
-              <Image 
-                src="/images/team-01.png"
-                alt={charity.beneficiary} 
-                width={40} 
-                height={40} 
-                className="rounded-full"
-              />
-            </div>
-          </div>
-        </div>
+<div className="flex justify-between items-center">
+  <h1 className="text-3xl font-bold text-gray-700">{charity.projectName}</h1>
+  <div className="flex items-center space-x-4">
+    <CurrencyToggle />
+    <div className="flex items-center">
+      <span className="mr-2">{"Aid Africa"}</span>
+      <Image 
+        src="/images/team-01.png"
+        alt={charity.beneficiary} 
+        width={40} 
+        height={40} 
+        className="rounded-full"
+      />
+    </div>
+  </div>
+</div>
         
         {/* Main Content */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
@@ -168,36 +174,49 @@ const CharityDetails = () => {
           </div>
 
           {/* Right Column - Description and Donate */}
-          <div>
-            <p className="text-gray-600">{charity.description}</p>
-            
-            <div className="mt-6">
-              <div className="bg-gray-100 p-4 rounded-lg mb-4">
-                <div className="flex justify-between items-center mb-2">
-                  <span className="text-green-600 font-semibold">
-                    {formatAmount(charity.raisedAmount)} raised
-                  </span>
-                  <span className="text-gray-500">
-                    of {formatAmount(charity.goalAmount)}
-                  </span>
-                </div>
-                <div className="w-full bg-gray-200 rounded-full h-2.5 mb-2">
-                  <div 
-                    className="bg-green-600 h-2.5 rounded-full transition-all duration-300" 
-                    style={{
-                      width: `${Math.min((charity.raisedAmount / charity.goalAmount) * 100, 100)}%`
-                    }}
-                  />
-                </div>
-              </div>
-              <SocialShare 
-                projectName={charity.projectName}
-                projectDescription={charity.description}
-              />
-              <Donate projectId={charity._id} />
-              
-            </div>
-          </div>
+<div>
+  <p className="text-gray-600">{charity.description}</p>
+  
+  <div className="mt-6">
+    {/* Progress Bar */}
+    <div className="bg-gray-100 p-4 rounded-lg mb-4">
+      <div className="flex justify-between items-center mb-2">
+        <span className="text-green-600 font-semibold">
+          {formatAmount(charity.raisedAmount)} raised
+        </span>
+        <span className="text-gray-500">
+          of {formatAmount(charity.goalAmount)}
+        </span>
+      </div>
+      <div className="w-full bg-gray-200 rounded-full h-3">
+        <div 
+          className="bg-green-600 h-3 rounded-full transition-all duration-300" 
+          style={{
+            width: `${Math.min((charity.raisedAmount / charity.goalAmount) * 100, 100)}%`
+          }}
+        />
+      </div>
+    </div>
+    
+    {/* Tags and Social Share Container */}
+<div className="flex justify-between items-center mb-6">
+  <div className="flex gap-3">
+    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-orange-50 text-orange-600 border border-orange-100 whitespace-nowrap">
+      Humanitarian Assistance
+    </span>
+    <span className="inline-flex items-center px-4 py-1.5 rounded-full text-sm font-medium bg-green-50 text-green-600 border border-green-100 whitespace-nowrap">
+      Hunger Relief
+    </span>
+  </div>
+  <SocialShare 
+    projectName={charity.projectName}
+    projectDescription={charity.description}
+  />
+</div>
+
+    <Donate projectId={charity._id} />
+  </div>
+</div>
         </div>
 
         {/* Milestones and Other Sections */}
